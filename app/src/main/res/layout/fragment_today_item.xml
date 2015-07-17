@@ -1,0 +1,312 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivityFragment"
+    android:background="#EBEBEB">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="12"
+        android:background="#EBEBEB"
+        android:layout_margin="0dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            android:weightSum="20"
+            android:paddingLeft="24sp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3">
+                <TextView android:id="@+id/weather_today_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Thursday, July 19"
+                    android:textSize="28sp"
+                    android:fontFamily="sans-serif-condensed"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="8">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="23&#xb0;"
+                    android:textSize="100sp"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:id="@+id/weather_today_temp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="21&#xb0; - 26&#xb0;"
+                    android:textSize="36sp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="6sp"
+                    android:id="@+id/weather_today_temp_bounds" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="7">
+                <ImageView
+                    android:id="@+id/img_today"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/art_clear"
+                    android:adjustViewBounds="true"
+                    android:focusableInTouchMode="false" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="12sp">
+
+                    <TextView android:id="@+id/weather_today_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="thunderstorm with heavy drizzle"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:fontFamily="sans-serif-condensed"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="12sp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/img_humidity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/humidity"
+                            android:adjustViewBounds="true"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="80%"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:layout_marginLeft="12sp"
+                            android:id="@+id/weather_today_humidity" />
+                        <ImageView
+                            android:id="@+id/img_wind"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/wind"
+                            android:adjustViewBounds="true"
+                            android:layout_marginLeft="18sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="5.1m/s NS"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:layout_marginLeft="10sp"
+                            android:id="@+id/weather_today_wind" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:gravity="right">
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:weightSum="4"
+            android:focusable="false">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:weightSum="4"
+                android:paddingLeft="24sp">
+
+                <TextView android:id="@+id/weather_hourly_title"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Forecast"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:fontFamily="sans-serif-condensed"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:weightSum="4"
+                android:id="@+id/layout_forecast">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:weightSum="10">
+                    <TextView android:id="@+id/weather_hourly_time_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2"
+                        android:text="03:00"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                    <ImageView
+                        android:id="@+id/img_hourly_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="5"
+                        android:src="@drawable/art_rain"/>
+                    <TextView android:id="@+id/weather_hourly_temp_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="3"
+                        android:text="22&#xb0;"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:weightSum="10">
+                    <TextView android:id="@+id/weather_hourly_time_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2"
+                        android:text="03:00"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                    <ImageView
+                        android:id="@+id/img_hourly_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="5"
+                        android:src="@drawable/art_rain" />
+                    <TextView android:id="@+id/weather_hourly_temp_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="3"
+                        android:text="22&#xb0;"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:weightSum="10">
+                    <TextView android:id="@+id/weather_hourly_time_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2"
+                        android:text="03:00"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                    <ImageView
+                        android:id="@+id/img_hourly_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="5"
+                        android:src="@drawable/art_rain" />
+                    <TextView android:id="@+id/weather_hourly_temp_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="3"
+                        android:text="22&#xb0;"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:weightSum="10">
+                    <TextView android:id="@+id/weather_hourly_time_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2"
+                        android:text="03:00"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                    <ImageView
+                        android:id="@+id/img_hourly_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="5"
+                        android:src="@drawable/art_rain" />
+                    <TextView android:id="@+id/weather_hourly_temp_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="3"
+                        android:text="22&#xb0;"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:fontFamily="sans-serif-condensed"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
+
+
+
+
+
+
+
