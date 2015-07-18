@@ -13,9 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.concurrent.ExecutionException;
-
-import barogo.mayweather.data.CurrentWeather;
+import barogo.mayweather.sync.WeatherSyncAdapter;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -25,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWeatherDataFromDB();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -64,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        WeatherSyncAdapter.initializeSyncAdapter(this);
+
     }
     @Override
     public void onPause() {
@@ -91,26 +92,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void getWeatherDataFromDB() {
-        try {
-            FetchWeatherTask curWeatherTask = new FetchWeatherTask(this);
-            FetchWeatherTask foreWeatherTask = new FetchWeatherTask(this);
-            FetchWeatherTask weatherTask = new FetchWeatherTask(this);
-
-            curWeatherTask.execute("http://api.openweathermap.org/data/2.5/weather?q=st.+johns&units=metric", WeatherDataParser.CURRENT_WEATHER).get();
-            foreWeatherTask.execute("http://api.openweathermap.org/data/2.5/forecast?q=st.+johns&units=metric&cnt=4", WeatherDataParser.HOURLY_WEATHER).get();
-            weatherTask.execute("http://api.openweathermap.org/data/2.5/forecast/daily?q=st.+johns&units=metric&cnt=16", WeatherDataParser.DAILY_WEATHER).get();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        CurrentWeather.CURRENT = WeatherDataParser.getCurWeatherFromDB(this);
-        CurrentWeather.HOURLY_FORECAST = WeatherDataParser.getHourlyWeatherFromDB(this);
     }
 
     class SwipeTabAdapter extends FragmentStatePagerAdapter {

@@ -28,9 +28,9 @@ public class WeatherDataParser {
 
     private static final String LOG_TAG = WeatherDataParser.class.getSimpleName();
 
-    public static final int CURRENT_WEATHER = 0;
-    public static final int HOURLY_WEATHER = 1;
-    public static final int DAILY_WEATHER = 2;
+//    public static final int CURRENT_WEATHER = 0;
+//    public static final int HOURLY_WEATHER = 1;
+//    public static final int DAILY_WEATHER = 2;
 
     public static int findWeatherConditionImg(String condition) {
 
@@ -80,6 +80,13 @@ public class WeatherDataParser {
         return new String[]{month + " " + day, hour+":"+min};
     }
 
+    public static String getCurTime(String simpleDate){
+        String time = simpleDate.split(" ")[1];
+        String hour = time.split(":")[0];
+        String min = time.split(":")[1];
+        return hour + ":" + min;
+    }
+
     public static String getDayOfWeek(String simpleDate){   //2015-07-13 15:05:36
         String result = "";
         SimpleDateFormat format1=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -106,7 +113,7 @@ public class WeatherDataParser {
     public static int getWeatherDataFromJsonSaveDB
             (Context context, String forecastJsonStr, int forecastType) throws JSONException {
 
-        if (forecastType ==  CURRENT_WEATHER) {
+        if (forecastType ==  WeatherContract.WEATHER_TYPE_CURRENT) {
             //long date; String description, icon;
             //double temp, temp_max, temp_min, humidity, rain;
             //double speed, deg;
@@ -178,7 +185,7 @@ public class WeatherDataParser {
 
             return inserted;
 
-        } else if (forecastType ==  HOURLY_WEATHER) {
+        } else if (forecastType ==  WeatherContract.WEATHER_TYPE_HOURLY) {
             //long date;
             //double temp;
             //String description, icon;
@@ -245,7 +252,7 @@ public class WeatherDataParser {
             ArrayList<CurrentWeatherVo> listHourlyData = new ArrayList<CurrentWeatherVo>();
 
             for (int i=0; i<forecastValues.length; i++) {
-                listHourlyData.add(CurrentWeather.convertContentValues(forecastValues[i]));
+                listHourlyData.add(convertContentValues(forecastValues[i]));
             }
 //            CurrentWeather.HOURLY_FORECAST = null;
 //            CurrentWeather.HOURLY_FORECAST = listHourlyData;
@@ -253,7 +260,7 @@ public class WeatherDataParser {
             int inserted = context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, forecastValues);
 
             return inserted;
-        } else if (forecastType ==  DAILY_WEATHER) {
+        } else if (forecastType ==  WeatherContract.WEATHER_TYPE_DAILY) {
             //long date;
             //double max, min;
             //String description, icon;
@@ -311,7 +318,7 @@ public class WeatherDataParser {
             ArrayList<CurrentWeatherVo> listDailyData = new ArrayList<CurrentWeatherVo>();
 
             for (int i=0; i<forecastValues.length; i++) {
-                listDailyData.add(CurrentWeather.convertContentValues(forecastValues[i]));
+                listDailyData.add(convertContentValues(forecastValues[i]));
             }
 //            CurrentWeather.DAILY_FORECAST = null;
 //            CurrentWeather.DAILY_FORECAST = listDailyData;
@@ -438,4 +445,26 @@ public class WeatherDataParser {
         return dailyWeather;
     }
 
+    public static CurrentWeatherVo convertContentValues(ContentValues values){
+        CurrentWeatherVo vo = new CurrentWeatherVo();
+        vo.location_id = (int) values.get(WeatherContract.WeatherEntry.COLUMN_LOC_KEY);
+        vo.weather_type = (int) values.get(WeatherContract.WeatherEntry.COLUMN_TYPE);
+        vo.date = (String) values.get(WeatherContract.WeatherEntry.COLUMN_DATE);
+        vo.main = (String) values.get(WeatherContract.WeatherEntry.COLUMN_MAIN);
+        vo.desc = (String) values.get(WeatherContract.WeatherEntry.COLUMN_DESC);
+        vo.icon = (String) values.get(WeatherContract.WeatherEntry.COLUMN_ICON);
+        vo.pressure = (double) values.get(WeatherContract.WeatherEntry.COLUMN_PRESSURE);
+        vo.humidity = (int) values.get(WeatherContract.WeatherEntry.COLUMN_HUMIDITY);
+        vo.temp = (double) values.get(WeatherContract.WeatherEntry.COLUMN_TEMP);
+        vo.temp_max = (double) values.get(WeatherContract.WeatherEntry.COLUMN_TEMP_MAX);
+        vo.temp_min = (double) values.get(WeatherContract.WeatherEntry.COLUMN_TEMP_MIN);
+        vo.wind_speed = (double) values.get(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED);
+        vo.wind_degree = (int) values.get(WeatherContract.WeatherEntry.COLUMN_WIND_DEGREE);
+        vo.clouds = (int) values.get(WeatherContract.WeatherEntry.COLUMN_CLOUDS);
+        vo.rain = (double) values.get(WeatherContract.WeatherEntry.COLUMN_RAIN);
+        vo.snow = (double) values.get(WeatherContract.WeatherEntry.COLUMN_SNOW);
+        vo.sunrise = (String) values.get(WeatherContract.WeatherEntry.COLUMN_SUNRISE);
+        vo.sunset = (String) values.get(WeatherContract.WeatherEntry.COLUMN_SUNSET);
+        return vo;
+    }
 }

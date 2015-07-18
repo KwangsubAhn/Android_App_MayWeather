@@ -83,29 +83,33 @@ public class FragmentDailyForecast extends Fragment implements LoaderManager.Loa
 
         data.moveToLast();
 
-        do {
-            Object[] row = new Object[columns.length];
-            row[0] = data.getInt(0);
-            row[1] = data.getInt(1);
-            row[2] = data.getInt(2);
-            row[3] = data.getString(3);
-            row[4] = data.getString(4);
-            row[5] = data.getString(5);
-            row[6] = data.getString(6);
-            row[7] = data.getDouble(7);
-            row[8] = data.getInt(8);
-            row[9] = data.getDouble(9);
-            row[10] = data.getDouble(10);
-            row[11] = data.getDouble(11);
-            row[12] = data.getDouble(12);
-            row[13] = data.getInt(13);
-            row[14] = data.getInt(14);
-            row[15] = data.getDouble(15);
-            row[16] = data.getDouble(16);
-            row[17] = data.getString(17);
-            row[18] = data.getString(18);
-            matrixCursor.addRow(row);
-        } while (data.moveToPrevious());
+        if (data.getCount() != 0) {
+            do {
+                Object[] row = new Object[columns.length];
+                row[0] = data.getInt(0);
+                row[1] = data.getInt(1);
+                row[2] = data.getInt(2);
+                row[3] = data.getString(3);
+                row[4] = data.getString(4);
+                row[5] = data.getString(5);
+                row[6] = data.getString(6);
+                row[7] = data.getDouble(7);
+                row[8] = data.getInt(8);
+                row[9] = data.getDouble(9);
+                row[10] = data.getDouble(10);
+                row[11] = data.getDouble(11);
+                row[12] = data.getDouble(12);
+                row[13] = data.getInt(13);
+                row[14] = data.getInt(14);
+                row[15] = data.getDouble(15);
+                row[16] = data.getDouble(16);
+                row[17] = data.getString(17);
+                row[18] = data.getString(18);
+                matrixCursor.addRow(row);
+            } while (data.moveToPrevious());
+        }
+
+
 
         mDailyAdapter.swapCursor(matrixCursor);
     }

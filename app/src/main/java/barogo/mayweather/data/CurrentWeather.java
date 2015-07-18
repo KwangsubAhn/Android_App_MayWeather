@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class CurrentWeather {
 
-    public static CurrentWeatherVo CURRENT = null;
+    /*public static CurrentWeatherVo CURRENT = null;
     public static ArrayList<CurrentWeatherVo> HOURLY_FORECAST = null;
 //    public static ArrayList<CurrentWeatherVo> DAILY_FORECAST = null;
 
@@ -34,6 +34,6 @@ public class CurrentWeather {
         vo.sunrise = (String) values.get(WeatherContract.WeatherEntry.COLUMN_SUNRISE);
         vo.sunset = (String) values.get(WeatherContract.WeatherEntry.COLUMN_SUNSET);
         return vo;
-    }
+    }*/
 
 }
