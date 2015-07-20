@@ -2,7 +2,12 @@
     <string name="app_name">MayWeather</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
 
     <string name="sync_account_type">barogo.mayweather</string>
     <string name="content_authority">barogo.mayweather</string>
+
+    <string name="pref_location_label">Location</string>
+    <string name="pref_location_key" translatable="false">location</string>
+    <string name="pref_location_default" translatable="false">94043</string>
 </resources>

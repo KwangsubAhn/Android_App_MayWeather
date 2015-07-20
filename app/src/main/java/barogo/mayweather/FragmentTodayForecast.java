@@ -81,7 +81,6 @@ public class FragmentTodayForecast extends Fragment {
 
                 if (intent.getAction() == "TODAY") {
                     CurrentWeatherVo weatherVo = intent.getParcelableExtra("CURRENT");
-                    WeatherDataParser.curDate = WeatherDataParser.getReadableDateString(weatherVo.date)[0];
 
                     //Current
                     TextView weather_today_data = (TextView) rootView.findViewById(R.id.weather_today_date);
@@ -114,7 +113,6 @@ public class FragmentTodayForecast extends Fragment {
                     CurrentWeatherVo weatherVo1 = intent.getParcelableExtra("HOURLY1");
                     CurrentWeatherVo weatherVo2 = intent.getParcelableExtra("HOURLY2");
                     CurrentWeatherVo weatherVo3 = intent.getParcelableExtra("HOURLY3");
-                    WeatherDataParser.hourlyForecast = WeatherDataParser.getReadableDateString(weatherVo0.date)[0];
 
                     TextView weather_hourly_time_1 = (TextView) rootView.findViewById(R.id.weather_hourly_time_1);
                     weather_hourly_time_1.setText(WeatherDataParser.getReadableDateString(weatherVo0.date)[1]);

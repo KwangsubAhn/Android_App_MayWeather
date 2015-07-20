@@ -22,7 +22,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import barogo.mayweather.R;
 import barogo.mayweather.WeatherDataParser;
@@ -39,8 +42,9 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
     public static final int SYNC_INTERVAL = 30;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
-    private int cntInterval = 0;
-    private String curDate = "";
+    public static String location = "";
+    public static String flagHourly = "";
+    public static String flagDaily = "";
 
     public SyncAdapterCurrent(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -48,41 +52,52 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.e(LOG_TAG, "onPerformSync Called.000 " + WeatherDataParser.curDate);
-        cntInterval++;
+        Log.e(LOG_TAG, "onPerformSync Called.");
+
+        //get Current WeatherInfo from cloud
+        String strUrlCurrent = "http://api.openweathermap.org/data/2.5/weather?q=st.+johns&units=metric";
+        getWeatherInfo(strUrlCurrent, WeatherContract.WEATHER_TYPE_CURRENT);
+
+        //sent Current WeatherInfo to UI
+        CurrentWeatherVo weatherVoCurrent = WeatherDataParser.getCurWeatherFromDB(getContext());
+        Intent intentCurrent = new Intent("TODAY");
+        intentCurrent.putExtra("CURRENT", weatherVoCurrent);
+        LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentCurrent);
+        //
+
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Canada/Newfoundland"));
+        Date date = calendar.getTime();
+
+        int hour = calendar.get(Calendar.HOUR);
+        int day = calendar.get(Calendar.DATE);
 
         //get Hourly WeatherInfo from cloud (every 80min)
-        if (cntInterval%4 == 1) {
-            String strUrl = "http://api.openweathermap.org/data/2.5/forecast?q=st.+johns&units=metric&cnt=4";
-            getWeatherInfo(strUrl, WeatherContract.WEATHER_TYPE_HOURLY);
+        if (!flagHourly.equals(Integer.toString(hour))) {
+            flagHourly = Integer.toString(hour);
 
-            List<CurrentWeatherVo> weatherVo = WeatherDataParser.getHourlyWeatherFromDB(getContext());
-            Intent intent = new Intent("HOURLY");
-            intent.putExtra("HOURLY0", weatherVo.get(0));
-            intent.putExtra("HOURLY1", weatherVo.get(1));
-            intent.putExtra("HOURLY2", weatherVo.get(2));
-            intent.putExtra("HOURLY3", weatherVo.get(3));
+            String strUrlHourly = "http://api.openweathermap.org/data/2.5/forecast?q=st.+johns&units=metric&cnt=4";
+            getWeatherInfo(strUrlHourly, WeatherContract.WEATHER_TYPE_HOURLY);
 
-            LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intent);
+            List<CurrentWeatherVo> weatherVoHourly = WeatherDataParser.getHourlyWeatherFromDB(getContext());
+            Intent intentHourly = new Intent("HOURLY");
+            intentHourly.putExtra("HOURLY0", weatherVoHourly.get(0));
+            intentHourly.putExtra("HOURLY1", weatherVoHourly.get(1));
+            intentHourly.putExtra("HOURLY2", weatherVoHourly.get(2));
+            intentHourly.putExtra("HOURLY3", weatherVoHourly.get(3));
+
+            LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentHourly);
 
         }
 
         //get Daily WeatherInfo from cloud (once a day)
-        if (curDate != WeatherDataParser.curDate){
-            curDate = WeatherDataParser.curDate;
-            cntInterval = 0;
+        if (!flagDaily.equals(Integer.toString(day))){
+            flagDaily = Integer.toString(day);
+
+            String strUrlDaily = "http://api.openweathermap.org/data/2.5/forecast/daily?q=st.+johns&units=metric&cnt=16";
+            getWeatherInfo(strUrlDaily, WeatherContract.WEATHER_TYPE_DAILY);
         }
 
-        //get Current WeatherInfo from cloud
-        String strUrl = "http://api.openweathermap.org/data/2.5/weather?q=st.+johns&units=metric";
-        getWeatherInfo(strUrl, WeatherContract.WEATHER_TYPE_CURRENT);
 
-        //sent Current WeatherInfo to UI
-        CurrentWeatherVo weatherVo = WeatherDataParser.getCurWeatherFromDB(getContext());
-        Intent intent = new Intent("TODAY");
-        intent.putExtra("CURRENT", weatherVo);
-        LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intent);
-        //
 
     }
 
