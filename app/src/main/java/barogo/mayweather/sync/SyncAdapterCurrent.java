@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import barogo.mayweather.R;
 import barogo.mayweather.WeatherDataParser;
@@ -31,20 +32,62 @@ import barogo.mayweather.data.WeatherContract;
 /**
  * Created by user on 2015-07-18.
  */
-public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
+public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
 
-    public final String LOG_TAG = WeatherSyncAdapter.class.getSimpleName();
+    public final String LOG_TAG = SyncAdapterCurrent.class.getSimpleName();
 
     public static final int SYNC_INTERVAL = 30;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
-    public WeatherSyncAdapter(Context context, boolean autoInitialize) {
+    private int cntInterval = 0;
+    private String curDate = "";
+
+    public SyncAdapterCurrent(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        Log.d(LOG_TAG, "onPerformSync Called.");
+        Log.e(LOG_TAG, "onPerformSync Called.000 " + WeatherDataParser.curDate);
+        cntInterval++;
+
+        //get Hourly WeatherInfo from cloud (every 80min)
+        if (cntInterval%4 == 1) {
+            String strUrl = "http://api.openweathermap.org/data/2.5/forecast?q=st.+johns&units=metric&cnt=4";
+            getWeatherInfo(strUrl, WeatherContract.WEATHER_TYPE_HOURLY);
+
+            List<CurrentWeatherVo> weatherVo = WeatherDataParser.getHourlyWeatherFromDB(getContext());
+            Intent intent = new Intent("HOURLY");
+            intent.putExtra("HOURLY0", weatherVo.get(0));
+            intent.putExtra("HOURLY1", weatherVo.get(1));
+            intent.putExtra("HOURLY2", weatherVo.get(2));
+            intent.putExtra("HOURLY3", weatherVo.get(3));
+
+            LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intent);
+
+        }
+
+        //get Daily WeatherInfo from cloud (once a day)
+        if (curDate != WeatherDataParser.curDate){
+            curDate = WeatherDataParser.curDate;
+            cntInterval = 0;
+        }
+
+        //get Current WeatherInfo from cloud
+        String strUrl = "http://api.openweathermap.org/data/2.5/weather?q=st.+johns&units=metric";
+        getWeatherInfo(strUrl, WeatherContract.WEATHER_TYPE_CURRENT);
+
+        //sent Current WeatherInfo to UI
+        CurrentWeatherVo weatherVo = WeatherDataParser.getCurWeatherFromDB(getContext());
+        Intent intent = new Intent("TODAY");
+        intent.putExtra("CURRENT", weatherVo);
+        LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intent);
+        //
+
+    }
+
+    //getWeatherInfo from cloud and Save to DB
+    private void getWeatherInfo(String strUrl, int type){
 
         //
         HttpURLConnection urlConnection = null;
@@ -53,7 +96,7 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
         String forecastJsonStr = null;
 
         try {
-            URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=st.+johns&units=metric");
+            URL url = new URL(strUrl);
 
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -80,7 +123,7 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
             forecastJsonStr = buffer.toString();
 
             int result = WeatherDataParser.getWeatherDataFromJsonSaveDB(getContext(),
-                    forecastJsonStr, WeatherContract.WEATHER_TYPE_CURRENT);
+                    forecastJsonStr, type);
 
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
@@ -101,16 +144,8 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
-        //
-
-        CurrentWeatherVo weatherVo = WeatherDataParser.getCurWeatherFromDB(getContext());
-
-        Intent intent = new Intent("TODAY");
-        intent.putExtra("CURRENT", weatherVo);
-        LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intent);
-
-
     }
+
 
     public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
         Account account = getSyncAccount(context);
@@ -181,7 +216,7 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
         /*
          * Since we've created an account
          */
-        WeatherSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
+        SyncAdapterCurrent.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
 
         /*
          * Without calling setSyncAutomatically, our periodic sync will not be enabled.

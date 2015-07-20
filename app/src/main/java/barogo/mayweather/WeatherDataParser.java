@@ -28,6 +28,8 @@ public class WeatherDataParser {
 
     private static final String LOG_TAG = WeatherDataParser.class.getSimpleName();
 
+    public static String curDate = "";
+    public static String hourlyForecast = "";
 //    public static final int CURRENT_WEATHER = 0;
 //    public static final int HOURLY_WEATHER = 1;
 //    public static final int DAILY_WEATHER = 2;

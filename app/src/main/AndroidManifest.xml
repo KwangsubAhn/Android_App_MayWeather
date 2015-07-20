@@ -42,7 +42,7 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <service android:name=".sync.WeatherSyncService"
+        <service android:name=".sync.SyncServiceWeatherCurrent"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />

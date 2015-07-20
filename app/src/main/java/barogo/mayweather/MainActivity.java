@@ -13,7 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import barogo.mayweather.sync.WeatherSyncAdapter;
+import barogo.mayweather.sync.SyncAdapterCurrent;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -60,11 +60,11 @@ public class MainActivity extends AppCompatActivity {
                 if (state == ViewPager.SCROLL_STATE_SETTLING) {
                     Log.d(LOG_TAG, "onPageScrollStateChanged Settling");
                 }
-            }
-        });
+    }
+});
 
-        WeatherSyncAdapter.initializeSyncAdapter(this);
-
+        SyncAdapterCurrent.initializeSyncAdapter(this);
+//        SyncAdapterHourly.initializeSyncAdapter(this);
     }
     @Override
     public void onPause() {
