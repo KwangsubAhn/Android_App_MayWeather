@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import barogo.mayweather.R;
-import barogo.mayweather.WeatherDataParser;
+import barogo.mayweather.Utility;
 import barogo.mayweather.data.CurrentWeatherVo;
 import barogo.mayweather.data.WeatherContract;
 
@@ -52,14 +53,30 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+
+        String location = "st.+johns";
+        String unit = "metric";
         Log.e(LOG_TAG, "onPerformSync Called.");
 
         //get Current WeatherInfo from cloud
-        String strUrlCurrent = "http://api.openweathermap.org/data/2.5/weather?q=st.+johns&units=metric";
+        final String CURRENT_BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
+        final String FORECAST_HOURLY_URL = "http://api.openweathermap.org/data/2.5/forecast?";
+        final String FORECAST_DAILY_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+        final String LOCATION_PARAM = "q";
+        final String UNITS_PARAM = "units";
+        final String DAYS_PARAM = "cnt";
+
+        Uri builtUri = Uri.parse(CURRENT_BASE_URL).buildUpon()
+                .appendQueryParameter(LOCATION_PARAM, location)
+                .appendQueryParameter(UNITS_PARAM, unit)
+                .build();
+
+
+        String strUrlCurrent = builtUri.toString();
         getWeatherInfo(strUrlCurrent, WeatherContract.WEATHER_TYPE_CURRENT);
 
         //sent Current WeatherInfo to UI
-        CurrentWeatherVo weatherVoCurrent = WeatherDataParser.getCurWeatherFromDB(getContext());
+        CurrentWeatherVo weatherVoCurrent = Utility.getCurWeatherFromDB(getContext());
         Intent intentCurrent = new Intent("TODAY");
         intentCurrent.putExtra("CURRENT", weatherVoCurrent);
         LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentCurrent);
@@ -75,10 +92,16 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
         if (!flagHourly.equals(Integer.toString(hour))) {
             flagHourly = Integer.toString(hour);
 
-            String strUrlHourly = "http://api.openweathermap.org/data/2.5/forecast?q=st.+johns&units=metric&cnt=4";
+            builtUri = Uri.parse(FORECAST_HOURLY_URL).buildUpon()
+                    .appendQueryParameter(LOCATION_PARAM, location)
+                    .appendQueryParameter(UNITS_PARAM, unit)
+                    .appendQueryParameter(DAYS_PARAM, "4")
+                    .build();
+
+            String strUrlHourly = builtUri.toString();
             getWeatherInfo(strUrlHourly, WeatherContract.WEATHER_TYPE_HOURLY);
 
-            List<CurrentWeatherVo> weatherVoHourly = WeatherDataParser.getHourlyWeatherFromDB(getContext());
+            List<CurrentWeatherVo> weatherVoHourly = Utility.getHourlyWeatherFromDB(getContext());
             Intent intentHourly = new Intent("HOURLY");
             intentHourly.putExtra("HOURLY0", weatherVoHourly.get(0));
             intentHourly.putExtra("HOURLY1", weatherVoHourly.get(1));
@@ -93,7 +116,13 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
         if (!flagDaily.equals(Integer.toString(day))){
             flagDaily = Integer.toString(day);
 
-            String strUrlDaily = "http://api.openweathermap.org/data/2.5/forecast/daily?q=st.+johns&units=metric&cnt=16";
+            builtUri = Uri.parse(FORECAST_DAILY_URL).buildUpon()
+                    .appendQueryParameter(LOCATION_PARAM, location)
+                    .appendQueryParameter(UNITS_PARAM, unit)
+                    .appendQueryParameter(DAYS_PARAM, "16")
+                    .build();
+
+            String strUrlDaily = builtUri.toString();
             getWeatherInfo(strUrlDaily, WeatherContract.WEATHER_TYPE_DAILY);
         }
 
@@ -137,9 +166,9 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
             }
             forecastJsonStr = buffer.toString();
 
-            int result = WeatherDataParser.getWeatherDataFromJsonSaveDB(getContext(),
+            int result = Utility.getWeatherDataFromJsonSaveDB(getContext(),
                     forecastJsonStr, type);
-
+            System.out.print("d");
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             forecastJsonStr = null;

@@ -1,11 +1,17 @@
 package barogo.mayweather;
 
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+
+import barogo.mayweather.sync.SyncAdapterCurrent;
 
 /**
  * Created by user on 2015-07-20.
@@ -19,6 +25,7 @@ public class SettingsActivity extends PreferenceActivity
 
         addPreferencesFromResource(R.xml.pref_general);
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
     }
 
     /**
@@ -40,7 +47,9 @@ public class SettingsActivity extends PreferenceActivity
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
+
         String stringValue = value.toString();
+        CharSequence stringValue2 = preference.getSummary();
 
         if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in
@@ -54,6 +63,17 @@ public class SettingsActivity extends PreferenceActivity
             // For other preferences, set the summary to the value's simple string representation.
             preference.setSummary(stringValue);
         }
+
+        if (preference.getTitle().equals(this.getString(R.string.pref_units_label))) {
+            //restart
+            if (stringValue2!=null &&
+                    !stringValue.toUpperCase().equals(stringValue2.toString().toUpperCase())) {
+                Intent intent = this.getIntent();
+                this.setResult(RESULT_OK, intent);
+            }
+
+        }
+
         return true;
     }
 }

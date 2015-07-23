@@ -2,7 +2,9 @@ package barogo.mayweather;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -14,9 +16,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
-import barogo.mayweather.data.CurrentWeather;
 import barogo.mayweather.data.CurrentWeatherVo;
 import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherContract.WeatherEntry;
@@ -24,9 +26,9 @@ import barogo.mayweather.data.WeatherContract.WeatherEntry;
 /**
  * Created by user on 2015-07-17.
  */
-public class WeatherDataParser {
+public class Utility {
 
-    private static final String LOG_TAG = WeatherDataParser.class.getSimpleName();
+    private static final String LOG_TAG = Utility.class.getSimpleName();
 
 //    public static final int CURRENT_WEATHER = 0;
 //    public static final int HOURLY_WEATHER = 1;
@@ -92,7 +94,7 @@ public class WeatherDataParser {
         SimpleDateFormat format1=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
             Date dt1=format1.parse(simpleDate);
-            DateFormat format2=new SimpleDateFormat("EE");
+            DateFormat format2=new SimpleDateFormat("EEEE");
             result = format2.format(dt1);
         } catch (ParseException e) {
             Log.e(LOG_TAG, e.getMessage());
@@ -178,12 +180,11 @@ public class WeatherDataParser {
 
             ContentValues[] forecastValues = {values};
 
-            int inserted = context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, forecastValues);
+            int deleted = context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
+                    WeatherEntry.COLUMN_TYPE + " == " + WeatherContract.WEATHER_TYPE_CURRENT, null);
+            context.getContentResolver().insert(WeatherContract.WeatherEntry.CONTENT_URI, values);
 
-//            CurrentWeather.CURRENT = null;
-//            CurrentWeather.CURRENT = CurrentWeather.convertContentValues(values);
-
-            return inserted;
+            return 1;
 
         } else if (forecastType ==  WeatherContract.WEATHER_TYPE_HOURLY) {
             //long date;
@@ -212,7 +213,7 @@ public class WeatherDataParser {
                 JSONObject elemWind = arrList.getJSONObject(i).getJSONObject("wind");
 
                 double rain = 0.0d;
-                if (forecastJson.has("rain")) {
+                if (arrList.getJSONObject(i).has("rain")) {
                     JSONObject elemRain = arrList.getJSONObject(i).getJSONObject("rain");
                     rain = elemRain.getDouble("3h");
                 }
@@ -256,9 +257,10 @@ public class WeatherDataParser {
             }
 //            CurrentWeather.HOURLY_FORECAST = null;
 //            CurrentWeather.HOURLY_FORECAST = listHourlyData;
-
+            int deleted = context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
+                    WeatherEntry.COLUMN_TYPE + " == " + WeatherContract.WEATHER_TYPE_HOURLY, null);
             int inserted = context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, forecastValues);
-
+            List<CurrentWeatherVo> weatherVoHourly = Utility.getHourlyWeatherFromDB(context);
             return inserted;
         } else if (forecastType ==  WeatherContract.WEATHER_TYPE_DAILY) {
             //long date;
@@ -278,8 +280,9 @@ public class WeatherDataParser {
                 String strCurDate = sdf.format(curDate);
 
                 JSONObject elemTemp = arrList.getJSONObject(i).getJSONObject("temp");
-
                 JSONArray arrWeather = arrList.getJSONObject(i).getJSONArray("weather");
+//                JSONObject elemWind = arrList.getJSONObject(i).getJSONObject("wind");
+//                JSONObject elemClouds = arrList.getJSONObject(i).getJSONObject("clouds");
 
                 double rain = 0.0d;
                 if (arrList.getJSONObject(i).has("rain")) {
@@ -288,19 +291,19 @@ public class WeatherDataParser {
 
                 double snow = 0.0d;
                 if (arrList.getJSONObject(i).has("snow")) {
-                    rain = arrList.getJSONObject(i).getDouble("snow");
+                    snow = arrList.getJSONObject(i).getDouble("snow");
                 }
 
                 ContentValues weatherValues_Daily = new ContentValues();
 
                 weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, 1);
-                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_TYPE, WeatherContract.WEATHER_TYPE_DAILY);
-                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_DATE, strCurDate);
-                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_MAIN, arrWeather.getJSONObject(0).getString("main"));
-                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_DESC, arrWeather.getJSONObject(0).getString("description"));
-                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_ICON, arrWeather.getJSONObject(0).getString("icon"));
-                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, arrList.getJSONObject(i).getDouble("pressure"));
-                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, arrList.getJSONObject(i).getInt("humidity"));
+                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_TYPE, WeatherContract.WEATHER_TYPE_DAILY);//
+                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_DATE, strCurDate);//
+                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_MAIN, arrWeather.getJSONObject(0).getString("main"));//
+                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_DESC, arrWeather.getJSONObject(0).getString("description"));//
+                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_ICON, arrWeather.getJSONObject(0).getString("icon"));//
+                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, arrList.getJSONObject(i).getDouble("pressure"));//
+                weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, arrList.getJSONObject(i).getInt("humidity"));//
                 weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_TEMP, 0d);
                 weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_TEMP_MAX, elemTemp.getDouble("max"));
                 weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_TEMP_MIN, elemTemp.getDouble("min"));//
@@ -322,10 +325,10 @@ public class WeatherDataParser {
             }
 //            CurrentWeather.DAILY_FORECAST = null;
 //            CurrentWeather.DAILY_FORECAST = listDailyData;
-
+            int deleted = context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
+                    WeatherEntry.COLUMN_TYPE + " == " + WeatherContract.WEATHER_TYPE_DAILY, null);
             int inserted = context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, forecastValues);
             return inserted;
-
         } else {
             return -1;
         }
@@ -467,4 +470,54 @@ public class WeatherDataParser {
         vo.sunset = (String) values.get(WeatherContract.WeatherEntry.COLUMN_SUNSET);
         return vo;
     }
+
+    public static String getPreferredLocation(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(context.getString(R.string.pref_location_key),
+                context.getString(R.string.pref_location_default));
+    }
+
+    public static boolean isMetric(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(context.getString(R.string.pref_units_key),
+                context.getString(R.string.pref_units_metric))
+                .equals(context.getString(R.string.pref_units_metric));
+    }
+
+    public static double getTemp(Context context, double metric) {
+        // Data stored in Celsius by default.  If user prefers to see in Fahrenheit, convert
+        // the values here.
+        double temperature = metric;
+
+        if (!isMetric(context)) {
+            temperature = (temperature * 1.8) + 32;
+        }
+
+        // For presentation, assume the user doesn't care about tenths of a degree.
+        return temperature;
+    }
+
+    public static String convertDegToDirection(int deg) {
+
+        if (22.5 < deg && deg <= 67.5) {            //NE    22.5 - 67.5
+            return "NE";
+        } else if (67.5 < deg && deg <= 112.5) {    //E     67.5 - 112.5
+            return "E";
+        } else if (112.5 < deg && deg <= 157.5) {   //SE    112.5 - 157.5
+            return "SE";
+        } else if (157.5 < deg && deg <= 202.5) {   //S     157.5 - 202.5
+            return "S";
+        } else if (202.5 < deg && deg <= 247.5) {   //SW    202.5 - 247.5
+            return "SW";
+        } else if (247.5 < deg && deg <= 292.5) {   //W     247.5 - 292.5
+            return "W";
+        } else if (292.5 < deg && deg <= 337.5) {   //NW    292.5 - 337.5
+            return "NW";
+        } else if (337.5 < deg && deg <= 22.5) {    //N     337.5 - 22.5
+            return "N";
+        } else {
+            return "";
+        }
+    }
+
 }

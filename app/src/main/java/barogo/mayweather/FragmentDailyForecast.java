@@ -96,8 +96,10 @@ public class FragmentDailyForecast extends Fragment implements LoaderManager.Loa
                 row[7] = data.getDouble(7);
                 row[8] = data.getInt(8);
                 row[9] = data.getDouble(9);
-                row[10] = data.getDouble(10);
-                row[11] = data.getDouble(11);
+                double tempMax = Utility.getTemp(getActivity(), data.getDouble(10));
+                row[10] = tempMax;//data.getDouble(10);//max
+                double tempMin = Utility.getTemp(getActivity(), data.getDouble(11));
+                row[11] = tempMin;//data.getDouble(11);//min
                 row[12] = data.getDouble(12);
                 row[13] = data.getInt(13);
                 row[14] = data.getInt(14);

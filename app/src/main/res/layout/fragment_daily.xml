@@ -11,7 +11,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="right|top"
-        android:listSelector="@android:color/transparent"
-        android:divider="@drawable/list_divider"
-        android:dividerHeight="2sp"/>
+        android:listSelector="@android:color/transparent"/>
 </FrameLayout>

@@ -36,7 +36,7 @@ public class AdapterDaily extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        viewHolder.iconView.setImageResource(WeatherDataParser.findWeatherConditionImg(
+        viewHolder.iconView.setImageResource(Utility.findWeatherConditionImg(
                 cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_ICON))));
 
         String simpleDate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
@@ -44,31 +44,50 @@ public class AdapterDaily extends CursorAdapter {
         String date = simpleDate.split(" ")[0];
         String dayOfMonth = date.split("-")[2];
 
-        String dayOfWeekweek = WeatherDataParser.getDayOfWeek(simpleDate);
+        String dayOfWeekweek = Utility.getDayOfWeek(simpleDate);
 
-//        SpannableString ss1=  new SpannableString(s);
-//        ss1.setSpan(new RelativeSizeSpan(1f), 0, s.length(), 0); // set size
-//        SpannableString ss2=  new SpannableString(ss);
-//        ss2.setSpan(new RelativeSizeSpan(1f), 0, ss.length(), 0); // set size
+        viewHolder.date.setText(Utility.getReadableDateString(simpleDate)[0]);
+        viewHolder.day.setText(dayOfWeekweek);
+        viewHolder.temp.setText("" + (int) Math.floor(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MIN))) + (char) 0x00B0 +
+                " - " + (int) Math.ceil(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MAX))) + (char) 0x00B0);
 
-        viewHolder.date.setText(TextUtils.concat(dayOfWeekweek.substring(0, 3), " ", dayOfMonth));
-        viewHolder.temp.setText(""+(int)Math.floor(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MIN))) + (char) 0x00B0 +
-                " - " + (int)Math.ceil(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MAX))) + (char) 0x00B0);
-        viewHolder.desc.setText(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESC)));
+        double rain = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN));
+        double snow = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_SNOW));
+        if (rain >= 0.5d) {
+            rain = Math.round(rain);
+            viewHolder.rainfall.setText(""+(int)rain+"mm");
+        } else if (rain > 0d && rain < 0.5d) {
+            viewHolder.rainfall.setText("<1" + "mm");
+        } else {
+            viewHolder.rainfall.setText("");
+        }
+
+        if (snow >= 0d && snow > rain) {
+            if (snow >= 0.5d) {
+                snow = Math.round(rain);
+                viewHolder.rainfall.setText(""+(int)snow+"mm");
+            } else if (snow > 0d && snow < 0.5d) {
+                viewHolder.rainfall.setText("<1" + "mm");
+            } else {
+                viewHolder.rainfall.setText("");
+            }
+        }
+
     }
 
     public static class ViewHolder {
+        public final TextView day;
         public final TextView date;
         public final ImageView iconView;
         public final TextView temp;
-        public final TextView desc;
+        public final TextView rainfall;
 
         public ViewHolder (View view) {
+            day = (TextView) view.findViewById(R.id.weather_daily_day);
             date = (TextView) view.findViewById(R.id.weather_daily_date);
-            date.setLineSpacing(-10, 1);
             iconView = (ImageView) view.findViewById(R.id.img_daily);
             temp = (TextView) view.findViewById(R.id.weather_daily_temp);
-            desc = (TextView) view.findViewById(R.id.weather_daily_desc);
+            rainfall = (TextView) view.findViewById(R.id.weather_daily_rainfall);
         }
 
     }

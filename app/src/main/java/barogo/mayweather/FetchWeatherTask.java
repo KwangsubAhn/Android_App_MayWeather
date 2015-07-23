@@ -64,17 +64,8 @@ public class FetchWeatherTask extends AsyncTask<Object, Void, Integer> {
             }
             forecastJsonStr = buffer.toString();
 
-            int result = WeatherDataParser.getWeatherDataFromJsonSaveDB(mContext, forecastJsonStr, (int) params[1]);
-
-//            if ((int) params[1] == WeatherDataParser.CURRENT_WEATHER) {
-//                CurrentWeather.CURRENT = result;
-//            } else if ((int) params[1] ==  WeatherDataParser.HOURLY_WEATHER) {
-//                CurrentWeather.HOULY_FORECAST = result;
-//            } else if ((int) params[1] ==  WeatherDataParser.DAILY_WEATHER) {
-//                CurrentWeather.DAILY_FORECAST = result;
-//            } else {
-//                Log.e(LOG_TAG, "WeatherDate Type is incorrect");
-//            }
+            int result = Utility.
+                    getWeatherDataFromJsonSaveDB(mContext, forecastJsonStr, (int) params[1]);
 
             return result;
 
