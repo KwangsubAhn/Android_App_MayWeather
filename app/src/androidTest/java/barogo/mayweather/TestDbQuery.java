@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.List;
 
 import barogo.mayweather.data.CurrentWeatherVo;
+import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherDbHelper;
 
 /**
@@ -19,6 +20,7 @@ public class TestDbQuery extends AndroidTestCase {
         SQLiteDatabase db = new WeatherDbHelper(this.mContext).getReadableDatabase();
         Cursor c = db.rawQuery("select * from weather order by weather_type", null);
         c.moveToFirst();
+        int cnt = c.getCount();
         do {
             StringBuffer sb = new StringBuffer();
             for (int i=0; i<c.getColumnCount(); i++) {
@@ -31,4 +33,12 @@ public class TestDbQuery extends AndroidTestCase {
         Log.e("QUERY: END", "");
         Log.e("", "");
     }
+
+    private void testQueryDeleteAll() throws Throwable {
+        int deleted = mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
+                null, null);
+        Log.d("", "deleted: "+ deleted);
+
+    }
+
 }

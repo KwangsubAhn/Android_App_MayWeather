@@ -7,7 +7,6 @@ import android.preference.PreferenceFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -32,7 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#357bbd")));
-        setTitle("Seoul");
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.drawable.actionbar_logo);
+        setTitle(" Seoul");
 
         viewPager = (ViewPager)findViewById(R.id.pager);
         viewPager.setAdapter(new SwipeTabAdapter(getSupportFragmentManager()));
@@ -94,15 +95,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivityForResult(new Intent(this, SettingsActivity.class), 1);
-//            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

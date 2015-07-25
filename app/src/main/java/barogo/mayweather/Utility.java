@@ -11,10 +11,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -343,6 +350,9 @@ public class Utility {
                 null,
                 WeatherContract.WeatherEntry.COLUMN_DATE + " DESC LIMIT 1"
         );
+
+        if (cursor.getCount() == 0) {return null;}
+
         cursor.moveToFirst();
 
         CurrentWeatherVo curWeather = new CurrentWeatherVo();
@@ -377,6 +387,8 @@ public class Utility {
                 null,
                 WeatherContract.WeatherEntry.COLUMN_DATE + " DESC LIMIT 4"
         );
+
+        if (cursor.getCount() < 4) {return null;}
 
         if (cursor.moveToLast()){
             do{
@@ -513,10 +525,39 @@ public class Utility {
             return "W";
         } else if (292.5 < deg && deg <= 337.5) {   //NW    292.5 - 337.5
             return "NW";
-        } else if (337.5 < deg && deg <= 22.5) {    //N     337.5 - 22.5
+        } else if ((337.5 < deg && deg <= 360) ||
+                    (0 <= deg && deg <= 22.5)) {    //N     337.5 - 22.5
             return "N";
         } else {
             return "";
+        }
+    }
+
+    public static Date getDate(String date) {      //ex) July 31
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int month = getMonthFromString(date.split(" ")[0]);
+        int day = Integer.parseInt(date.split(" ")[1]);
+
+        Date dt = new Date(year-1900, month-1, day);
+        return dt;
+
+    }
+
+    private static int getMonthFromString(String strMonth) {
+        switch (strMonth) {
+            case "January":     return 1;
+            case "February":    return 2;
+            case "March":       return 3;
+            case "April":       return 4;
+            case "May":         return 5;
+            case "June":        return 6;
+            case "July":        return 7;
+            case "August":      return 8;
+            case "September":   return 9;
+            case "October":     return 10;
+            case "November":    return 11;
+            case "December":    return 12;
+            default: return 0;
         }
     }
 

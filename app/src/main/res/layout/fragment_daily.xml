@@ -1,15 +1,17 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.android.sunshine.app.ForecastFragment"
-    android:id="@+id/fm_weather_daily">
+    android:id="@+id/fm_weather_daily"
+    android:orientation="vertical">
 
     <ListView
-        style="@style/DailyForecastListStyle"
         android:id="@+id/listview_forecast"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="right|top"
-        android:listSelector="@android:color/transparent"/>
-</FrameLayout>
+        android:dividerHeight="3sp"
+        android:divider="@drawable/list_divider"
+        android:background="#bfc5c7"/>
+</LinearLayout>

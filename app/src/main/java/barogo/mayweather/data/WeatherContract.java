@@ -16,10 +16,12 @@ public class WeatherContract {
 
     public static final String PATH_WEATHER = "weather";
     public static final String PATH_LOCATION = "location";
+    public static final String PATH_CITY = "city_list";
 
     public static final int WEATHER_TYPE_CURRENT = 1;
     public static final int WEATHER_TYPE_HOURLY = 2;
     public static final int WEATHER_TYPE_DAILY = 3;
+
     public static final class LocationEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI =

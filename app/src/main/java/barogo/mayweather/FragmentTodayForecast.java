@@ -1,5 +1,6 @@
 package barogo.mayweather;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Matrix;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,7 +68,15 @@ public class FragmentTodayForecast extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-           updateWeather();
+            ActivityManager manager = (ActivityManager) getActivity().getSystemService(getActivity().ACTIVITY_SERVICE);
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (service.service.getClassName().equals("barogo.mayweather.sync.WeatherAuthenticatorService") ||
+                        service.service.getClassName().equals("barogo.mayweather.sync.SyncServiceWeatherCurrent")) {
+                    Log.d("asdf", "dfasdf");
+                }
+            }
+            Log.d("","");
+//           updateWeather();
            return true;
         }
         return super.onOptionsItemSelected(item);
@@ -80,8 +90,11 @@ public class FragmentTodayForecast extends Fragment {
 
         CurrentWeatherVo cur = Utility.getCurWeatherFromDB(getActivity());
         ArrayList<CurrentWeatherVo> hourly = Utility.getHourlyWeatherFromDB(getActivity());
-        updateCurView(rootView, cur);
-        updateHourlyView(rootView, hourly);
+
+        if (cur != null) {updateCurView(rootView, cur);}
+
+        if (hourly != null) {updateHourlyView(rootView, hourly);}
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -132,8 +145,11 @@ public class FragmentTodayForecast extends Fragment {
         weather_today_temp.setText(""+Math.round(tempCur)+(char) 0x00B0);
 
         TextView weather_today_temp_bounds = (TextView) rootView.findViewById(R.id.weather_today_temp_bounds);
-        weather_today_temp_bounds.setText("" + (int) Math.floor(weatherVo.temp_min) + (char) 0x00B0 + " - "
-                + (int) Math.ceil(weatherVo.temp_max) + (char) 0x00B0);
+        double tempMin = Utility.getTemp(getActivity(), weatherVo.temp_min);
+        double tempMax = Utility.getTemp(getActivity(), weatherVo.temp_max);
+
+        weather_today_temp_bounds.setText("" + (int) Math.floor(tempMin) + (char) 0x00B0 + " - "
+                + (int) Math.ceil(tempMax) + (char) 0x00B0);
 
         ImageView img_today = (ImageView) rootView.findViewById(R.id.img_today);
         img_today.setImageResource(Utility.findWeatherConditionImg(weatherVo.icon));
@@ -169,9 +185,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_1.setImageResource(R.drawable.umbrella);
 
             TextView weather_hourly_rainfall_1 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_1);
-            weather_hourly_rainfall_1.setText(""+(int)Math.round(weatherVo0.rain) + "mm");
-            if (weatherVo0.rain < 0.5d) {
-                weather_hourly_rainfall_1.setText("<1" + "mm");
+            weather_hourly_rainfall_1.setText(""+(int)Math.round(weatherVo0.rain*10)/10.0d + "mm");
+            if (weatherVo0.rain < 0.05d) {
+                weather_hourly_rainfall_1.setText("<0.1" + "mm");
             }
         }
         if (weatherVo0.snow >= 0d && weatherVo0.snow > weatherVo0.rain) {
@@ -179,9 +195,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_1.setImageResource(R.drawable.snow);
 
             TextView weather_hourly_rainfall_1 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_1);
-            weather_hourly_rainfall_1.setText(""+(int)Math.round(weatherVo0.snow) + "mm");
-            if (weatherVo0.snow < 0.5d) {
-                weather_hourly_rainfall_1.setText("<1" + "mm");
+            weather_hourly_rainfall_1.setText(""+(int)Math.round(weatherVo0.snow*10)/10.0d + "mm");
+            if (weatherVo0.snow < 0.05d) {
+                weather_hourly_rainfall_1.setText("<0.1" + "mm");
             }
         }
 
@@ -200,9 +216,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_2.setImageResource(R.drawable.umbrella);
 
             TextView weather_hourly_rainfall_2 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_2);
-            weather_hourly_rainfall_2.setText(""+(int)Math.round(weatherVo1.rain) + "mm");
-            if (weatherVo1.rain < 0.5d) {
-                weather_hourly_rainfall_2.setText("<1" + "mm");
+            weather_hourly_rainfall_2.setText(""+(int)Math.round(weatherVo1.rain*10)/10.0d + "mm");
+            if (weatherVo1.rain < 0.05d) {
+                weather_hourly_rainfall_2.setText("<0.1" + "mm");
             }
         }
         if (weatherVo1.snow >= 0d && weatherVo1.snow > weatherVo1.rain) {
@@ -210,9 +226,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_2.setImageResource(R.drawable.snow);
 
             TextView weather_hourly_rainfall_2 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_2);
-            weather_hourly_rainfall_2.setText(""+(int)Math.round(weatherVo1.snow) + "mm");
-            if (weatherVo1.snow < 0.5d) {
-                weather_hourly_rainfall_2.setText("<1" + "mm");
+            weather_hourly_rainfall_2.setText(""+(int)Math.round(weatherVo1.snow*10)/10.0d + "mm");
+            if (weatherVo1.snow < 0.05d) {
+                weather_hourly_rainfall_2.setText("<0.1" + "mm");
             }
         }
 
@@ -232,9 +248,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_3.setImageResource(R.drawable.umbrella);
 
             TextView weather_hourly_rainfall_3 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_3);
-            weather_hourly_rainfall_3.setText(""+(int)Math.round(weatherVo2.rain) + "mm");
-            if (weatherVo2.rain < 0.5d) {
-                weather_hourly_rainfall_3.setText("<1" + "mm");
+            weather_hourly_rainfall_3.setText(""+(int)Math.round(weatherVo2.rain*10)/10.0d + "mm");
+            if (weatherVo2.rain < 0.05d) {
+                weather_hourly_rainfall_3.setText("<0.1" + "mm");
             }
         }
         if (weatherVo2.snow >= 0d && weatherVo2.snow > weatherVo2.rain) {
@@ -242,9 +258,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_3.setImageResource(R.drawable.snow);
 
             TextView weather_hourly_rainfall_3 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_3);
-            weather_hourly_rainfall_3.setText(""+(int)Math.round(weatherVo2.snow) + "mm");
-            if (weatherVo2.snow < 0.5d) {
-                weather_hourly_rainfall_3.setText("<1" + "mm");
+            weather_hourly_rainfall_3.setText(""+(int)Math.round(weatherVo2.snow*10)/10.0d + "mm");
+            if (weatherVo2.snow < 0.05d) {
+                weather_hourly_rainfall_3.setText("<0.1" + "mm");
             }
         }
 
@@ -264,9 +280,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_4.setImageResource(R.drawable.umbrella);
 
             TextView weather_hourly_rainfall_4 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_4);
-            weather_hourly_rainfall_4.setText(""+(int)Math.round(weatherVo3.rain) + "mm");
-            if (weatherVo3.rain < 0.5d) {
-                weather_hourly_rainfall_4.setText("<1" + "mm");
+            weather_hourly_rainfall_4.setText(""+(int)Math.round(weatherVo3.rain*10)/10.0d + "mm");
+            if (weatherVo3.rain < 0.05d) {
+                weather_hourly_rainfall_4.setText("<0.1" + "mm");
             }
         }
         if (weatherVo3.snow > 0d && weatherVo3.snow > weatherVo3.rain) {
@@ -274,9 +290,9 @@ public class FragmentTodayForecast extends Fragment {
             img_hourly_rainfall_4.setImageResource(R.drawable.snow);
 
             TextView weather_hourly_rainfall_4 = (TextView) rootView.findViewById(R.id.weather_hourly_rainfall_4);
-            weather_hourly_rainfall_4.setText(""+(int)Math.round(weatherVo3.snow) + "mm");
-            if (weatherVo3.snow < 0.5d) {
-                weather_hourly_rainfall_4.setText("<1" + "mm");
+            weather_hourly_rainfall_4.setText(""+(int)Math.round(weatherVo3.snow*10)/10.0d + "mm");
+            if (weatherVo3.snow < 0.05d) {
+                weather_hourly_rainfall_4.setText("<0.1" + "mm");
             }
         }
 

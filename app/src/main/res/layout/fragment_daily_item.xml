@@ -3,9 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#EBEBEB">
-
-
+    android:background="@drawable/customshape">
 
     <ImageView android:id="@+id/img_daily"
         android:layout_width="100sp"
@@ -55,14 +53,32 @@
                 android:lines="1"/>
         </LinearLayout>
 
-
-        <TextView android:id="@+id/weather_daily_temp"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="0sp"
             android:layout_height="match_parent"
-            android:text="21&#xb0; - 26&#xb0;"
-            android:textSize="30sp"
-            android:gravity="center_vertical"
-            android:layout_weight="4"/>
+            android:layout_weight="4">
+
+            <TextView android:id="@+id/weather_daily_temp"
+                android:layout_width="46sp"
+                android:layout_height="match_parent"
+                android:text="21&#xb0;"
+                android:textSize="30sp"
+                android:gravity="right|center_vertical"/>
+            <TextView
+                android:layout_width="18sp"
+                android:layout_height="match_parent"
+                android:textSize="30sp"
+                android:text="-"
+                android:gravity="center"/>
+            <TextView android:id="@+id/weather_daily_temp2"
+                android:layout_width="46sp"
+                android:layout_height="match_parent"
+                android:text="26&#xb0;"
+                android:textSize="30sp"
+                android:gravity="center_vertical"/>
+        </LinearLayout>
+
 
     </LinearLayout>
 
