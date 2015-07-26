@@ -141,13 +141,19 @@ public class Utility {
             double rain = 0.0d;
             if (forecastJson.has("rain")) {
                 JSONObject elemRain = forecastJson.getJSONObject("rain");
-                rain = elemRain.getDouble("1h");
+                if (elemRain.has("1h")) {
+                    rain = elemRain.getDouble("1h");
+                }
+
             }
 
             double snow = 0.0d;
             if (forecastJson.has("snow")) {
                 JSONObject elemSnow = forecastJson.getJSONObject("snow");
-                snow = elemSnow.getDouble("1h");
+                if (elemSnow.has("1h")) {
+                    snow = elemSnow.getDouble("1h");
+                }
+
             }
 
             long unixCurTime = forecastJson.getLong("dt");
@@ -222,13 +228,19 @@ public class Utility {
                 double rain = 0.0d;
                 if (arrList.getJSONObject(i).has("rain")) {
                     JSONObject elemRain = arrList.getJSONObject(i).getJSONObject("rain");
-                    rain = elemRain.getDouble("3h");
+                    if (elemRain.has("3h")) {
+                        rain = elemRain.getDouble("3h");
+                    }
+
                 }
 
                 double snow = 0.0d;
                 if (forecastJson.has("snow")) {
                     JSONObject elemSnow = arrList.getJSONObject(i).getJSONObject("snow");
-                    snow = elemSnow.getDouble("3h");
+                    if (elemSnow.has("3h")) {
+                        snow = elemSnow.getDouble("3h");
+                    }
+
                 }
 
 
@@ -262,8 +274,7 @@ public class Utility {
             for (int i=0; i<forecastValues.length; i++) {
                 listHourlyData.add(convertContentValues(forecastValues[i]));
             }
-//            CurrentWeather.HOURLY_FORECAST = null;
-//            CurrentWeather.HOURLY_FORECAST = listHourlyData;
+
             int deleted = context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
                     WeatherEntry.COLUMN_TYPE + " == " + WeatherContract.WEATHER_TYPE_HOURLY, null);
             int inserted = context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, forecastValues);
@@ -330,8 +341,7 @@ public class Utility {
             for (int i=0; i<forecastValues.length; i++) {
                 listDailyData.add(convertContentValues(forecastValues[i]));
             }
-//            CurrentWeather.DAILY_FORECAST = null;
-//            CurrentWeather.DAILY_FORECAST = listDailyData;
+
             int deleted = context.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
                     WeatherEntry.COLUMN_TYPE + " == " + WeatherContract.WEATHER_TYPE_DAILY, null);
             int inserted = context.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, forecastValues);

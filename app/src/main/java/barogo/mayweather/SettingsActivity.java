@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -24,6 +26,7 @@ import android.widget.LinearLayout;
 import java.util.List;
 
 import barogo.mayweather.data.CurrentWeatherVo;
+import barogo.mayweather.data.LocationVo;
 import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherDbHelper;
 import barogo.mayweather.sync.SyncAdapterCurrent;
@@ -56,8 +59,7 @@ public class SettingsActivity extends PreferenceActivity
 
         // Trigger the listener immediately with the preference's
         // current value.
-        onPreferenceChange(preference,
-                PreferenceManager
+        onPreferenceChange(preference, PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
     }
@@ -78,7 +80,13 @@ public class SettingsActivity extends PreferenceActivity
             }
         } else {
             // For other preferences, set the summary to the value's simple string representation.
-            preference.setSummary(stringValue);
+            if (preference.getTitle().equals(this.getString(R.string.pref_location_label)) &&
+                    stringValue2 != null ) {
+//                preference.setSummary(stringValue2);
+            } else {
+                preference.setSummary(stringValue);
+            }
+
         }
 
         //Location
@@ -86,34 +94,19 @@ public class SettingsActivity extends PreferenceActivity
             //restart
             if (stringValue2!=null &&
                     !stringValue.toUpperCase().equals(stringValue2.toString().toUpperCase())) {
-                //check if the city name exist
-                String location = "st.+johns";
-
-                //get Current WeatherInfo from cloud
-                final String CURRENT_BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
-                final String LOCATION_PARAM = "q";
-                final String UNITS_PARAM = "units";
-
-                Uri builtUri = Uri.parse(CURRENT_BASE_URL).buildUpon()
-                        .appendQueryParameter(LOCATION_PARAM, location)
-                        .appendQueryParameter(UNITS_PARAM, "metric")
-                        .build();
 
 
-                String strUrlCurrent = builtUri.toString();
-
-                Intent intent = this.getIntent();
-                intent.putExtra(this.getString(R.string.pref_location_label), stringValue);
-                this.setResult(RESULT_OK, intent);
 
                 /** Create List of cities with radio buttons */
                 FragmentManager manager = getFragmentManager();
+
                 CityDialogRadio choose = new CityDialogRadio();
                 Bundle b  = new Bundle();
                 b.putInt("position", 0);
                 b.putString("typed_name", stringValue);
                 choose.setArguments(b);
                 choose.show(manager, "alert_dialog_radio");
+
             }
         }
 
@@ -132,8 +125,26 @@ public class SettingsActivity extends PreferenceActivity
     }
 
     @Override
-    public void onPositiveClick(int position) {
-        this.position = position;
+    public void onPositiveClick(LocationVo selected) {
+
+        EditTextPreference pref = (EditTextPreference)findPreference(getString(R.string.pref_location_key));
+
+        if (selected != null) {
+            Intent intent = this.getIntent();
+            intent.putExtra(this.getString(R.string.pref_location_label), selected.city_name);
+            intent.putExtra("location", selected.city_name);
+            intent.putExtra("location_id", selected.location_setting);
+
+            pref.setSummary(selected.city_name);
+            pref.setText(selected.city_name);
+
+            this.setResult(RESULT_OK, intent);
+        } else {
+            Intent intent = this.getIntent();
+            pref.setSummary(pref.getSummary());
+            this.setResult(RESULT_CANCELED, intent);
+
+        }
 
         Log.d("PositiveClick", "  "+position);
         //tv.setText("Your Choice : " + Android.code[this.position]);

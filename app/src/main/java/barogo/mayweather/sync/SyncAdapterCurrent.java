@@ -7,11 +7,15 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -43,7 +47,6 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
     public static final int SYNC_INTERVAL = 30;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
-    public static String location = "";
     public static String flagHourly = "";
     public static String flagDaily = "";
 
@@ -54,9 +57,13 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         try {
-            String location = "st.+johns";
-            String unit = "metric";
             Log.e(LOG_TAG, "onPerformSync Called.");
+
+            String unit = "metric";
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
+            String location = settings.getString(getContext().getString(R.string.pref_location_key),
+                    getContext().getString(R.string.pref_location_default));
+
 
             //get Current WeatherInfo from cloud
             final String CURRENT_BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";

@@ -10,6 +10,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.util.ArrayList;
+
+import barogo.mayweather.data.CurrentWeatherVo;
+import barogo.mayweather.data.LocationVo;
+import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherDbHelper;
 
 /**
@@ -17,12 +22,14 @@ import barogo.mayweather.data.WeatherDbHelper;
  */
 public class CityDialogRadio extends DialogFragment {
 
+    ArrayList<LocationVo> listCities;
+
     /** Declaring the interface, to invoke a callback function in the implementing activity class */
     AlertPositiveListener alertPositiveListener;
 
     /** An interface to be implemented in the hosting activity for "OK" button click listener */
     interface AlertPositiveListener {
-        public void onPositiveClick(int position);
+        public void onPositiveClick(LocationVo item);
     }
 
     /** This is a callback method executed when this fragment is attached to an activity.
@@ -47,7 +54,8 @@ public class CityDialogRadio extends DialogFragment {
         public void onClick(DialogInterface dialog, int which) {
             AlertDialog alert = (AlertDialog)dialog;
             int position = alert.getListView().getCheckedItemPosition();
-            alertPositiveListener.onPositiveClick(position);
+            LocationVo vo = listCities.get(position);
+            alertPositiveListener.onPositiveClick(vo);
         }
     };
 
@@ -57,53 +65,76 @@ public class CityDialogRadio extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        /** Getting the arguments passed to this fragment */
         Bundle bundle = getArguments();
         int position = bundle.getInt("position");
         String strTypedName = bundle.getString("typed_name");
-        findCities(strTypedName);
-
-        /** Creating a builder for the alert dialog window */
+        listCities = findCities(strTypedName);
+        if (listCities.size()==0) {
+            this.dismiss();
+        }
         AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 
-        /** Setting a title for the window */
-        b.setTitle("Choose your version");
+        b.setTitle("Choose your city");
 
-        /** Setting items to the alert dialog */
-        String[] code = new String[]{
-                "Jelly Bean", "Ice Cream Sandwich", "Honeycomb", "gingerbread"
-        };
+        String[] code = new String[listCities.size()];
+        for (int i=0; i<code.length; i++) {
+            LocationVo vo = listCities.get(i);
+            String lat = "";
+            if (vo.coord_lat < 0) {
+                lat = "" + (int)Math.abs(vo.coord_lat) + "S";
+            } else {
+                lat = "" + (int)vo.coord_lat + "N";
+            }
+            String lon = "";
+            if (vo.coord_long < 0) {
+                lon = "" + (int)Math.abs(vo.coord_long) + "W";
+            } else {
+                lon = "" + (int)vo.coord_long + "E";
+            }
+
+            code[i] = vo.city_name + ", " + vo.country_code + " (" + lat + " " + lon + ")";
+        }
 
         b.setSingleChoiceItems(code, position, null);
-
-        /** Setting a positive button and its listener */
-        b.setPositiveButton("OK",positiveListener);
-
-        /** Setting a positive button and its listener */
+        b.setPositiveButton("OK", positiveListener);
         b.setNegativeButton("Cancel", null);
-
-        /** Creating the alert dialog window using the builder class */
         AlertDialog d = b.create();
 
-        /** Return the alert dialog window */
         return d;
     }
 
-    private void findCities(String name) {
-        SQLiteDatabase db = new WeatherDbHelper(getActivity()).getReadableDatabase();
-        Cursor c = db.rawQuery("select * from city_list where city_name like '%"
-                +name+"%'", null);
-        c.moveToFirst();
-        int cnt = c.getCount();
-        do {
-            int id = c.getInt(0);   //id
-            String cityName = c.getString(1);
-            int lat = c.getInt(2);
-            int lon = c.getInt(3);
-            String code = c.getString(4);
-        } while (c.moveToNext());
+    private ArrayList<LocationVo> findCities(String name) {
 
-        Log.d("","");
+        ArrayList<LocationVo> cities = new ArrayList<LocationVo>();
+
+        Cursor cursor = getActivity().getContentResolver().query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                null,
+                WeatherContract.LocationEntry.COLUMN_CITY_NAME + " COLLATE NOCASE like '%" + name + "%'",
+                null,
+                WeatherContract.LocationEntry.COLUMN_COUNTRY_CODE + " ASC"
+        );
+
+        if (cursor.moveToFirst()){
+            do{
+                StringBuffer sb = new StringBuffer();
+                LocationVo vo = new LocationVo();
+
+                for (int i=0; i<cursor.getColumnCount(); i++) {
+                    vo._id = cursor.getInt(0);
+                    vo.location_setting = cursor.getString(1);
+                    vo.city_name = cursor.getString(2);
+                    vo.coord_lat = cursor.getDouble(3);
+                    vo.coord_long = cursor.getDouble(4);
+                    vo.country_code = cursor.getString(5);
+                }
+
+                cities.add(vo);
+                // do what ever you want here
+            }while(cursor.moveToNext());
+        }
+
+        return cities;
     }
 
 }

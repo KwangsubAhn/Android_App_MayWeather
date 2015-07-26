@@ -16,7 +16,6 @@ public class WeatherContract {
 
     public static final String PATH_WEATHER = "weather";
     public static final String PATH_LOCATION = "location";
-    public static final String PATH_CITY = "city_list";
 
     public static final int WEATHER_TYPE_CURRENT = 1;
     public static final int WEATHER_TYPE_HOURLY = 2;
@@ -40,6 +39,7 @@ public class WeatherContract {
         public static final String COLUMN_CITY_NAME = "city_name";
         public static final String COLUMN_COORD_LAT = "coord_lat";
         public static final String COLUMN_COORD_LONG = "coord_long";
+        public static final String COLUMN_COUNTRY_CODE = "country_code";
 
         public static Uri buildLocationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

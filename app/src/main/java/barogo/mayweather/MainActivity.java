@@ -1,9 +1,11 @@
 package barogo.mayweather;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -33,7 +35,12 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#357bbd")));
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setIcon(R.drawable.actionbar_logo);
-        setTitle(" Seoul");
+
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        String location = settings.getString(this.getString(R.string.pref_location_key),
+                this.getString(R.string.pref_location_default));
+        setTitle(" " + location);
 
         viewPager = (ViewPager)findViewById(R.id.pager);
         viewPager.setAdapter(new SwipeTabAdapter(getSupportFragmentManager()));
@@ -87,9 +94,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            SyncAdapterCurrent.flagHourly = "";
-            SyncAdapterCurrent.flagDaily = "";
-            recreate();
+            if (data.hasExtra(this.getString(R.string.pref_units_label))) {
+                SyncAdapterCurrent.flagHourly = "";
+                SyncAdapterCurrent.flagDaily = "";
+                recreate();
+            } else if (data.hasExtra(this.getString(R.string.pref_location_label))) {
+                SyncAdapterCurrent.flagHourly = "";
+                SyncAdapterCurrent.flagDaily = "";
+                recreate();
+            }
+
         }
     }
 
