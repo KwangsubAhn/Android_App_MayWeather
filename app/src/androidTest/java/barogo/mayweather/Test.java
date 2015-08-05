@@ -44,6 +44,8 @@ public class Test extends AndroidTestCase {
             AssetManager am = mContext.getAssets();
             InputStream is = null;
 
+            String[] aaa = am.list("");
+
             is = am.open("city_list.txt");
 
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -96,9 +98,18 @@ public class Test extends AndroidTestCase {
     }
 
     private void readCity() throws Throwable {
+
+        Cursor cursor = mContext.getContentResolver().query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                null,
+                WeatherContract.LocationEntry.COLUMN_CITY_NAME + " COLLATE NOCASE like '%se%'",
+                null,
+                WeatherContract.LocationEntry.COLUMN_COUNTRY_CODE + " ASC"
+        );
+
         SQLiteDatabase db = new WeatherDbHelper(this.mContext).getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
-//        Cursor c = db.rawQuery("select * from location", null);
+//        Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
+        Cursor c = db.rawQuery("select * from location", null);
 //        Cursor c = db.rawQuery("select * from city_list where city_name like '%londoN%'", null);
         c.moveToFirst();
         int cnt = c.getCount();

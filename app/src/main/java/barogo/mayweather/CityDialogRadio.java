@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -64,6 +66,7 @@ public class CityDialogRadio extends DialogFragment {
      */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        this.setCancelable(false);
 
         Bundle bundle = getArguments();
         int position = bundle.getInt("position");
@@ -71,6 +74,10 @@ public class CityDialogRadio extends DialogFragment {
         listCities = findCities(strTypedName);
         if (listCities.size()==0) {
             this.dismiss();
+            Toast.makeText(getActivity(), "NO CITY HAS BEEN FOUND", Toast.LENGTH_LONG).show();
+        } else if (listCities.size() > 100) {
+            this.dismiss();
+            Toast.makeText(getActivity(), "Too many cities found. Please type more specifically", Toast.LENGTH_LONG).show();
         }
         AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 
@@ -97,7 +104,7 @@ public class CityDialogRadio extends DialogFragment {
 
         b.setSingleChoiceItems(code, position, null);
         b.setPositiveButton("OK", positiveListener);
-        b.setNegativeButton("Cancel", null);
+//        b.setNegativeButton("Cancel", null);
         AlertDialog d = b.create();
 
         return d;
@@ -136,5 +143,4 @@ public class CityDialogRadio extends DialogFragment {
 
         return cities;
     }
-
 }

@@ -33,7 +33,7 @@
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:layout_marginTop="12sp" />
-                <TextView android:id="@+id/last_update"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text=""
@@ -61,8 +61,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="21&#xb0; - 26&#xb0;"
-                    android:textSize="36sp"
+                    android:textSize="34sp"
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="6sp"
                     android:id="@+id/weather_today_temp_bounds" />
@@ -87,7 +86,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:layout_marginLeft="12sp"
                     android:layout_weight="1">
 
                     <LinearLayout
@@ -168,16 +166,20 @@
                 android:weightSum="2">
                 <TextView android:id="@+id/weather_today_desc"
                     android:layout_width="0sp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:text="thunderstorm with heavy drizzle"
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textSize="12sp"
                     android:fontFamily="sans-serif-condensed"
                     android:layout_weight="1"
-                    android:gravity="center"/>
-                <TextView
+                    android:gravity="top|center_horizontal"/>
+                <TextView android:id="@+id/last_update"
+                    android:textSize="10sp"
+                    android:gravity="right"
+                    android:layout_gravity="bottom"
                     android:layout_width="0sp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:paddingRight="24sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -264,16 +266,16 @@
                         android:layout_height="0sp"
                         android:layout_weight="2"
                         android:gravity="center">
-                        <ImageView
+                        <!--<ImageView
                             android:id="@+id/img_hourly_rainfall_1"
                             android:layout_width="30sp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"/>
+                            android:layout_gravity="center"/> -->
                         <TextView
                             android:id="@+id/weather_hourly_rainfall_1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:textAppearanceSmall" />
+                            android:textSize="12sp" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -311,16 +313,16 @@
                         android:layout_height="0sp"
                         android:layout_weight="2"
                         android:gravity="center">
-                        <ImageView
+                        <!--<ImageView
                             android:id="@+id/img_hourly_rainfall_2"
                             android:layout_width="30sp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"/>
+                            android:layout_gravity="center"/> -->
                         <TextView
                             android:id="@+id/weather_hourly_rainfall_2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:textAppearanceSmall" />
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
@@ -357,16 +359,16 @@
                         android:layout_height="0sp"
                         android:layout_weight="2"
                         android:gravity="center">
-                        <ImageView
+                        <!--<ImageView
                             android:id="@+id/img_hourly_rainfall_3"
                             android:layout_width="30sp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"/>
+                            android:layout_gravity="center"/>-->
                         <TextView
                             android:id="@+id/weather_hourly_rainfall_3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:textAppearanceSmall" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -404,16 +406,16 @@
                         android:layout_height="0sp"
                         android:layout_weight="2"
                         android:gravity="center">
-                        <ImageView
+                        <!--<ImageView
                             android:id="@+id/img_hourly_rainfall_4"
                             android:layout_width="30sp"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"/>
+                            android:layout_gravity="center"/>-->
                         <TextView
                             android:id="@+id/weather_hourly_rainfall_4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:textAppearanceSmall" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                 </LinearLayout>

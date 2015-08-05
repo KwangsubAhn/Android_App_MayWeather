@@ -2,8 +2,10 @@ package barogo.mayweather;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -11,12 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import barogo.mayweather.data.CurrentWeatherVo;
@@ -41,15 +38,25 @@ public class Utility {
 //    public static final int HOURLY_WEATHER = 1;
 //    public static final int DAILY_WEATHER = 2;
 
-    public static int findWeatherConditionImg(String condition) {
+    public static int findWeatherConditionImg(String condition, double rain) {
 
         switch (condition) {
-            case "01d": return R.drawable.art_clear;        case "01n": return R.drawable.art_clear;
-            case "02d": return R.drawable.art_light_clouds; case "02n": return R.drawable.art_light_clouds;
+            case "01d": return R.drawable.art_clear;        case "01n": return R.drawable.art_clear_night;
+            case "02d": return R.drawable.art_light_clouds; case "02n": return R.drawable.art_light_clouds_night;
             case "03d": return R.drawable.art_clouds;       case "03n": return R.drawable.art_clouds;
             case "04d": return R.drawable.art_clouds;       case "04n": return R.drawable.art_clouds;
-            case "09d": return R.drawable.art_rain;         case "09n": return R.drawable.art_rain;
-            case "10d": return R.drawable.art_shower_rain;  case "10n": return R.drawable.art_shower_rain;
+            case "09d":
+            case "09n": if (rain < 3.0d) {return R.drawable.art_light_rain3;}
+                        else if (rain < 10.0d) {return R.drawable.art_light_rain2;}
+                        else {return R.drawable.art_light_rain;}
+            case "10d": if (rain < 3.0d) {return R.drawable.art_shower_rain3;}
+                        else if (rain < 10.0d) {return R.drawable.art_shower_rain2;}
+                        else {return R.drawable.art_shower_rain;}
+            case "10n": if (rain < 3.0d) {return R.drawable.art_shower_rain_night3;}
+                        else if (rain < 10.0d) {return R.drawable.art_shower_rain_night2;}
+                        else {return R.drawable.art_shower_rain_night;}
+//            case "09d": return R.drawable.art_rain;         case "09n": return R.drawable.art_rain;
+//            case "10d": return R.drawable.art_shower_rain;  case "10n": return R.drawable.art_shower_rain_night;
             case "11d": return R.drawable.art_storm;        case "11n": return R.drawable.art_storm;
             case "13d": return R.drawable.art_snow;         case "13n": return R.drawable.art_snow;
             case "50d": return R.drawable.art_fog;          case "50n": return R.drawable.art_fog;
@@ -101,7 +108,7 @@ public class Utility {
         SimpleDateFormat format1=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         try {
             Date dt1=format1.parse(simpleDate);
-            DateFormat format2=new SimpleDateFormat("EEEE");
+            DateFormat format2=new SimpleDateFormat("EEEE", Locale.ENGLISH);
             result = format2.format(dt1);
         } catch (ParseException e) {
             Log.e(LOG_TAG, e.getMessage());
@@ -122,6 +129,9 @@ public class Utility {
     public static int getWeatherDataFromJsonSaveDB
             (Context context, String forecastJsonStr, int forecastType) throws JSONException {
 
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        String timezone = settings.getString("TIME_ZONE", "UTC");
+
         if (forecastType ==  WeatherContract.WEATHER_TYPE_CURRENT) {
             //long date; String description, icon;
             //double temp, temp_max, temp_min, humidity, rain;
@@ -130,11 +140,20 @@ public class Utility {
 
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray arrWeather = forecastJson.getJSONArray("weather");
-            JSONObject elemWeather = arrWeather.getJSONObject(arrWeather.length()-1);
+            JSONObject elemWeather = arrWeather.getJSONObject(arrWeather.length() - 1);
 
             JSONObject elemMain = forecastJson.getJSONObject("main");
 
             JSONObject elemWind = forecastJson.getJSONObject("wind");
+            double speed = 0d;
+            int deg = 0;
+            if (elemWind.has("speed")) {
+                speed = elemWind.getDouble("speed");
+            }
+            if (elemWind.has("deg")) {
+                deg = elemWind.getInt("deg");
+            }
+
 
             JSONObject elemCloud = forecastJson.getJSONObject("clouds");
 
@@ -159,7 +178,7 @@ public class Utility {
             long unixCurTime = forecastJson.getLong("dt");
             Date curDate = new Date(unixCurTime*1000L);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-            sdf.setTimeZone(TimeZone.getTimeZone("Canada/Newfoundland"));
+            sdf.setTimeZone(TimeZone.getTimeZone(timezone));
             String strCurDate = sdf.format(curDate);
 
             JSONObject elemSys = forecastJson.getJSONObject("sys");
@@ -183,8 +202,8 @@ public class Utility {
             values.put(WeatherEntry.COLUMN_TEMP, elemMain.getDouble("temp"));
             values.put(WeatherEntry.COLUMN_TEMP_MAX, elemMain.getDouble("temp_max"));
             values.put(WeatherEntry.COLUMN_TEMP_MIN, elemMain.getDouble("temp_min"));
-            values.put(WeatherEntry.COLUMN_WIND_SPEED, elemWind.getDouble("speed"));
-            values.put(WeatherEntry.COLUMN_WIND_DEGREE, elemWind.getInt("deg"));
+            values.put(WeatherEntry.COLUMN_WIND_SPEED, speed);
+            values.put(WeatherEntry.COLUMN_WIND_DEGREE, deg);
             values.put(WeatherEntry.COLUMN_CLOUDS, elemCloud.getInt("all"));
             values.put(WeatherEntry.COLUMN_RAIN, rain);
             values.put(WeatherEntry.COLUMN_SNOW, snow);
@@ -215,7 +234,7 @@ public class Utility {
                 long unixCurTime = arrList.getJSONObject(i).getLong("dt");
                 Date curDate = new Date(unixCurTime*1000L);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-                sdf.setTimeZone(TimeZone.getTimeZone("Canada/Newfoundland"));
+                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
                 String strCurDate = sdf.format(curDate);
 
                 JSONObject elemMain = arrList.getJSONObject(i).getJSONObject("main");
@@ -224,6 +243,14 @@ public class Utility {
 
                 JSONObject elemCloud = arrList.getJSONObject(i).getJSONObject("clouds");
                 JSONObject elemWind = arrList.getJSONObject(i).getJSONObject("wind");
+                double speed = 0d;
+                int deg = 0;
+                if (elemWind.has("speed")) {
+                    speed = elemWind.getDouble("speed");
+                }
+                if (elemWind.has("deg")) {
+                    deg = elemWind.getInt("deg");
+                }
 
                 double rain = 0.0d;
                 if (arrList.getJSONObject(i).has("rain")) {
@@ -257,8 +284,8 @@ public class Utility {
                 weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_TEMP, elemMain.getDouble("temp"));
                 weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_TEMP_MAX, elemMain.getDouble("temp_max"));
                 weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_TEMP_MIN, elemMain.getDouble("temp_min"));//
-                weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, elemWind.getDouble("speed"));
-                weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_WIND_DEGREE, elemWind.getInt("deg"));
+                weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, speed);
+                weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_WIND_DEGREE, deg);
                 weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_CLOUDS, elemCloud.getInt("all"));
                 weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_RAIN, rain);
                 weatherValues_Hourly.put(WeatherContract.WeatherEntry.COLUMN_SNOW, snow);
@@ -288,15 +315,35 @@ public class Utility {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray arrList = forecastJson.getJSONArray("list");
 
-            ContentValues[] forecastValues = new ContentValues[arrList.length()];
-
+//            ContentValues[] forecastValues = new ContentValues[arrList.length()];
+            ArrayList<ContentValues> listForecastValues = new ArrayList<ContentValues>();
             for(int i = 0; i < arrList.length(); i++) {
                 long unixCurTime = arrList.getJSONObject(i).getLong("dt");
                 Date curDate = new Date(unixCurTime*1000L);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-                sdf.setTimeZone(TimeZone.getTimeZone("Canada/Newfoundland"));
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
                 String strCurDate = sdf.format(curDate);
 
+                try {
+                    SimpleDateFormat ssdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    curDate = ssdf.parse(strCurDate);
+                } catch (ParseException e) {
+                    Log.d(LOG_TAG,e.getMessage());
+                }
+
+                String bCurTime = settings.getString("CURRENT_TIME", "");
+                bCurTime = bCurTime.split(" ")[0];
+                int year = Integer.parseInt(bCurTime.split("-")[0]);
+                int month = Integer.parseInt(bCurTime.split("-")[1]);
+                int day = Integer.parseInt(bCurTime.split("-")[2]);
+                Date date = new Date(year-1900, month-1, day+1);
+
+
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+//                Date date = calendar.getTime();
+                if (!curDate.after(date)) {
+                    continue;
+                }
                 JSONObject elemTemp = arrList.getJSONObject(i).getJSONObject("temp");
                 JSONArray arrWeather = arrList.getJSONObject(i).getJSONArray("weather");
 //                JSONObject elemWind = arrList.getJSONObject(i).getJSONObject("wind");
@@ -332,8 +379,13 @@ public class Utility {
                 weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_SNOW, snow);
                 weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_SUNRISE, "");
                 weatherValues_Daily.put(WeatherContract.WeatherEntry.COLUMN_SUNSET, "");
-                forecastValues[i] = weatherValues_Daily;
+                listForecastValues.add(weatherValues_Daily);
+//                forecastValues[i] = weatherValues_Daily;
 
+            }
+            ContentValues[] forecastValues = new ContentValues[listForecastValues.size()];
+            for (int i=0; i<forecastValues.length; i++) {
+                forecastValues[i] = listForecastValues.get(i);
             }
 
             ArrayList<CurrentWeatherVo> listDailyData = new ArrayList<CurrentWeatherVo>();
@@ -395,10 +447,10 @@ public class Utility {
                 null,
                 WeatherContract.WeatherEntry.COLUMN_TYPE + " = " + WeatherContract.WEATHER_TYPE_HOURLY,
                 null,
-                WeatherContract.WeatherEntry.COLUMN_DATE + " DESC LIMIT 4"
+                WeatherContract.WeatherEntry.COLUMN_DATE + " DESC LIMIT 8"
         );
 
-        if (cursor.getCount() < 4) {return null;}
+        if (cursor.getCount() < 8) {return null;}
 
         if (cursor.moveToLast()){
             do{
@@ -569,6 +621,50 @@ public class Utility {
             case "December":    return 12;
             default: return 0;
         }
+    }
+
+    public static double[] getMaxMin(List<CurrentWeatherVo> weatherVoHourly) {
+        if (weatherVoHourly.size() > 0) {
+            double max = weatherVoHourly.get(0).temp_max;
+            double min = weatherVoHourly.get(0).temp_min;
+
+            for (CurrentWeatherVo vo : weatherVoHourly) {
+                if (max < vo.temp_max) {
+                    max = vo.temp_max;
+                }
+                if (min > vo.temp_min) {
+                    min = vo.temp_min;
+                }
+            }
+
+            double[] maxmin = {max, min};
+            return maxmin;
+        } else {
+            return null;
+        }
+    }
+
+    public static boolean isInternetOn(ContextWrapper context) {
+
+        // get Connectivity Manager object to check connection
+        ConnectivityManager connec =
+                (ConnectivityManager)context.getSystemService(context.getBaseContext().CONNECTIVITY_SERVICE);
+
+        // Check for network connections
+        if ( connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTING ||
+                connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED ) {
+
+            return true;
+
+        } else if (
+                connec.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.DISCONNECTED ||
+                        connec.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.DISCONNECTED  ) {
+
+            return false;
+        }
+        return false;
     }
 
 }

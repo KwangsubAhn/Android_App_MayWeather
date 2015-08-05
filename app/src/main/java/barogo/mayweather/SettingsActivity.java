@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -22,7 +23,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import java.util.Date;
 import java.util.List;
 
 import barogo.mayweather.data.CurrentWeatherVo;
@@ -60,8 +63,8 @@ public class SettingsActivity extends PreferenceActivity
         // Trigger the listener immediately with the preference's
         // current value.
         onPreferenceChange(preference, PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+                .getDefaultSharedPreferences(preference.getContext())
+                .getString(preference.getKey(), ""));
     }
 
     @Override
@@ -82,6 +85,10 @@ public class SettingsActivity extends PreferenceActivity
             // For other preferences, set the summary to the value's simple string representation.
             if (preference.getTitle().equals(this.getString(R.string.pref_location_label)) &&
                     stringValue2 != null ) {
+                if (!Utility.isInternetOn(this)) {
+                    Toast.makeText(this, "Please check internet connection", Toast.LENGTH_LONG).show();
+                    return false;
+                }
 //                preference.setSummary(stringValue2);
             } else {
                 preference.setSummary(stringValue);
@@ -106,6 +113,8 @@ public class SettingsActivity extends PreferenceActivity
                 b.putString("typed_name", stringValue);
                 choose.setArguments(b);
                 choose.show(manager, "alert_dialog_radio");
+
+                return false;
 
             }
         }
@@ -138,6 +147,18 @@ public class SettingsActivity extends PreferenceActivity
             pref.setSummary(selected.city_name);
             pref.setText(selected.city_name);
 
+            ///
+            double lat = selected.coord_lat;
+            double log = selected.coord_long;
+            Date now = new Date();
+            Long unixTime = new Long(now.getTime()/1000);
+
+
+            AsyncGetTimeZone task = new AsyncGetTimeZone(this);
+
+            task.execute(new Object[]{lat, log, unixTime});
+            ///
+
             this.setResult(RESULT_OK, intent);
         } else {
             Intent intent = this.getIntent();
@@ -147,6 +168,5 @@ public class SettingsActivity extends PreferenceActivity
         }
 
         Log.d("PositiveClick", "  "+position);
-        //tv.setText("Your Choice : " + Android.code[this.position]);
     }
 }

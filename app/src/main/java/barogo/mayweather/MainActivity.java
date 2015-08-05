@@ -2,6 +2,7 @@ package barogo.mayweather;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceFragment;
@@ -16,6 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import barogo.mayweather.sync.SyncAdapterCurrent;
 
@@ -41,6 +48,18 @@ public class MainActivity extends AppCompatActivity {
         String location = settings.getString(this.getString(R.string.pref_location_key),
                 this.getString(R.string.pref_location_default));
         setTitle(" " + location);
+
+        boolean bFirst = settings.getBoolean("FirstLaunch", true);
+        if (bFirst) {
+            settings.edit().putBoolean("FirstLaunch", false).commit();
+            settings.edit().putString("TIME_ZONE", "UTC");
+            settings.edit().putString("Flag_Hourly", "");
+            settings.edit().putString("Flag_Daily", "");
+            deleteExistDB();
+            moveFile();
+        }
+//        settings.edit().putString("SSSS", "SSSS");
+
 
         viewPager = (ViewPager)findViewById(R.id.pager);
         viewPager.setAdapter(new SwipeTabAdapter(getSupportFragmentManager()));
@@ -75,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
 });
 
         SyncAdapterCurrent.initializeSyncAdapter(this);
-//        SyncAdapterHourly.initializeSyncAdapter(this);
     }
     @Override
     public void onPause() {
@@ -93,15 +111,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+
         if (resultCode == RESULT_OK) {
             if (data.hasExtra(this.getString(R.string.pref_units_label))) {
-                SyncAdapterCurrent.flagHourly = "";
-                SyncAdapterCurrent.flagDaily = "";
-                recreate();
+                settings.edit().putString("Flag_Hourly", "");
+                settings.edit().putString("Flag_Daily", "");
+                this.finish();
+                this.startActivity(this.getIntent());
+//                recreate();
             } else if (data.hasExtra(this.getString(R.string.pref_location_label))) {
-                SyncAdapterCurrent.flagHourly = "";
-                SyncAdapterCurrent.flagDaily = "";
-                recreate();
+                settings.edit().putString("Flag_Hourly", "");
+                settings.edit().putString("Flag_Daily", "");
+                this.finish();
+                this.startActivity(this.getIntent());
+//                recreate();
             }
 
         }
@@ -113,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
+
             startActivityForResult(new Intent(this, SettingsActivity.class), 1);
             return true;
         }
@@ -143,6 +168,61 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return amountTabs;
+        }
+    }
+
+    public void deleteExistDB() {
+        String filePath = "/data/data/" + "barogo.mayweather" + "/databases/" + "mayweather.db";
+        File file = new File(filePath);
+
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    public void moveFile() {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+
+        try {
+            AssetManager am = this.getApplicationContext().getAssets();//u have get assets path from this ocde
+            inputStream = am.open("mayweather.db");
+
+            // write the inputStream to a FileOutputStream
+            File file = new File("/data/data/" + "barogo.mayweather" + "/databases/" + "mayweather.db");
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            boolean aa = file.exists();
+            outputStream = new FileOutputStream(file);
+
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            while ((read = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }
+
+            System.out.println("Done!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (outputStream != null) {
+                try {
+                    // outputStream.flush();
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
     }
 

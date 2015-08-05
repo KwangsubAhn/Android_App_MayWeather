@@ -2,9 +2,13 @@ package barogo.mayweather;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -22,7 +26,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
+import barogo.mayweather.data.CurrentWeatherVo;
+import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherContract.WeatherEntry;
 /**
  * Created by user on 2015-07-17.
@@ -50,7 +58,8 @@ public class AdapterDaily extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.iconView.setImageResource(Utility.findWeatherConditionImg(
-                cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_ICON))));
+                cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_ICON)),
+                Double.parseDouble(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN)))));
 
         String simpleDate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
 
@@ -60,17 +69,22 @@ public class AdapterDaily extends CursorAdapter {
         String dayOfWeek = Utility.getDayOfWeek(simpleDate);
 
         viewHolder.date.setText(Utility.getReadableDateString(simpleDate)[0]);
-//        viewHolder.day.setText(dayOfWeekweek);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final TextView todayView = (TextView)((Activity)context).getWindow().getDecorView().findViewById(R.id.weather_today_date);
 
         SpannableString spanDayOfWeek = new SpannableString(dayOfWeek);
 
-        Date dtToday = Utility.getDate((""+todayView.getText()).split(", ")[1]);
+        Date dtToday = Utility.getDate(("" + todayView.getText()).split(", ")[1]);
 
-        Calendar c = Calendar.getInstance();
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        String timezone = settings.getString("TIME_ZONE", "UTC");
+//        Calendar c = Calendar.getInstance();
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
         c.setTime(dtToday);
+
+        Date dtCurTime = c.getTime();
+
         c.add(Calendar.DATE, 1);
 
         Date dtAddOneDay = c.getTime();
@@ -88,26 +102,27 @@ public class AdapterDaily extends CursorAdapter {
         }
 
         viewHolder.day.setText(spanDayOfWeek);
-//        viewHolder.temp.setText("" + (int) Math.floor(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MIN))) + (char) 0x00B0 +
-//                " - " + (int) Math.ceil(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MAX))) + (char) 0x00B0);
+
         viewHolder.tempMin.setText("" + (int) Math.floor(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MIN))) + (char) 0x00B0);
 
         viewHolder.tempMax.setText("" + (int) Math.ceil(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MAX))) + (char) 0x00B0);
 
         double rain = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN));
         double snow = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_SNOW));
-        if (rain >= 0.05d) {
+        String desc = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESC));
+
+        if (rain >= 0.05d && desc.contains("rain")) {
             rain = Math.round(rain*10);
             rain = rain / 10.0d;
             viewHolder.rainfall.setText(""+rain+"mm");
-        } else if (rain > 0d && rain < 0.05d) {
+        } else if (rain > 0d && rain < 0.05d && desc.contains("rain")) {
             viewHolder.rainfall.setText("<0.1" + "mm");
         } else {
             viewHolder.rainfall.setText("");
-            if (cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESC)).contains("rain")) {viewHolder.rainfall.setText("<0.1" + "mm");}
+            if (desc.contains("rain")) {viewHolder.rainfall.setText("<0.1" + "mm");}
         }
 
-        if (snow >= 0d && snow > rain) {
+        if (snow >= 0d && snow > rain && desc.contains("snow")) {
             if (snow >= 0.05d) {
                 snow = Math.round(snow*10);
                 snow = snow / 10.0d;
@@ -116,7 +131,7 @@ public class AdapterDaily extends CursorAdapter {
                 viewHolder.rainfall.setText("<0.1" + "mm");
             } else {
                 viewHolder.rainfall.setText("");
-                if (cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESC)).contains("snow")) {viewHolder.rainfall.setText("<0.1" + "mm");}
+                if (desc.contains("snow")) {viewHolder.rainfall.setText("<0.1" + "mm");}
             }
         }
 

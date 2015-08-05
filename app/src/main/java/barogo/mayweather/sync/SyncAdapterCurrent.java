@@ -6,6 +6,7 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import barogo.mayweather.AsyncGetTimeZone;
 import barogo.mayweather.R;
 import barogo.mayweather.Utility;
 import barogo.mayweather.data.CurrentWeatherVo;
@@ -44,11 +46,12 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
 
     public final String LOG_TAG = SyncAdapterCurrent.class.getSimpleName();
 
-    public static final int SYNC_INTERVAL = 30;
+    public static final int SYNC_INTERVAL = 60*40;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
-    public static String flagHourly = "";
-    public static String flagDaily = "";
+
+
+//
 
     public SyncAdapterCurrent(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -57,13 +60,18 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         try {
+
             Log.e(LOG_TAG, "onPerformSync Called.");
+
 
             String unit = "metric";
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
             String location = settings.getString(getContext().getString(R.string.pref_location_key),
                     getContext().getString(R.string.pref_location_default));
 
+            String timezone = settings.getString("TIME_ZONE", "UTC");
+            String flagHourly = settings.getString("Flag_Hourly", "");
+            String flagDaily = settings.getString("Flag_Daily", "");
 
             //get Current WeatherInfo from cloud
             final String CURRENT_BASE_URL = "http://api.openweathermap.org/data/2.5/weather?";
@@ -92,20 +100,20 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
             LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentCurrent);
             //
 
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Canada/Newfoundland"));
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
             Date date = calendar.getTime();
 
             int hour = calendar.get(Calendar.HOUR);
             int day = calendar.get(Calendar.DATE);
 
             //get Hourly WeatherInfo from cloud (every 80min)
-            if (!flagHourly.equals(Integer.toString(hour))) {
-                flagHourly = Integer.toString(hour);
+//            if (!flagHourly.equals(Integer.toString(hour))) {
+                settings.getString("Flag_Hourly", Integer.toString(hour));
 
                 builtUri = Uri.parse(FORECAST_HOURLY_URL).buildUpon()
                         .appendQueryParameter(LOCATION_PARAM, location)
                         .appendQueryParameter(UNITS_PARAM, unit)
-                        .appendQueryParameter(DAYS_PARAM, "4")
+                        .appendQueryParameter(DAYS_PARAM, "8")
                         .build();
 
                 String strUrlHourly = builtUri.toString();
@@ -121,13 +129,21 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
                 intentHourly.putExtra("HOURLY2", weatherVoHourly.get(2));
                 intentHourly.putExtra("HOURLY3", weatherVoHourly.get(3));
 
-                LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentHourly);
 
-            }
+
+                //Get today's max/min temp
+                double[] dMaxMin = Utility.getMaxMin(weatherVoHourly);
+
+                intentHourly.putExtra("MAX", dMaxMin[0]);
+                intentHourly.putExtra("MIN", dMaxMin[1]);
+
+                LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentHourly);
+//            }
 
             //get Daily WeatherInfo from cloud (once a day)
             if (!flagDaily.equals(Integer.toString(day))){
-                flagDaily = Integer.toString(day);
+                Log.e(LOG_TAG, "Daily - onPerformSync Called.");
+                settings.getString("Flag_Daily", Integer.toString(day));
 
                 builtUri = Uri.parse(FORECAST_DAILY_URL).buildUpon()
                         .appendQueryParameter(LOCATION_PARAM, location)

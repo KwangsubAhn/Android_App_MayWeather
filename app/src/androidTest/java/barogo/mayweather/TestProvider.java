@@ -28,10 +28,10 @@ public class TestProvider extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        deleteAllRecords();
+//        deleteAllRecords();
     }
 
-    public void deleteAllRecords() {
+    /*public void deleteAllRecords() {
         deleteAllRecordsFromProvider();
     }
     public void deleteAllRecordsFromProvider() {
@@ -65,7 +65,7 @@ public class TestProvider extends AndroidTestCase {
         );
         assertEquals("Error: Records not deleted from Location table during delete", 0, cursor.getCount());
         cursor.close();
-    }
+    }*/
 
     public void testProviderRegistry() {
         PackageManager pm = mContext.getPackageManager();
