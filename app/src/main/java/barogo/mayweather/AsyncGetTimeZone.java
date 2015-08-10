@@ -1,11 +1,15 @@
 package barogo.mayweather;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +21,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import barogo.mayweather.data.WeatherContract;
+import barogo.mayweather.data.WeatherDbHelper;
 import barogo.mayweather.sync.SyncAdapterCurrent;
 
 /**
@@ -31,13 +37,43 @@ public class AsyncGetTimeZone extends AsyncTask<Object, Void, String> {
     }
 
     protected String doInBackground(Object... params) {
-        double latitude = (double)params[0];
-        double longitude = (double)params[1];
-        long unixTime = (long)params[2];
+        try {
+            double latitude = (double)params[0];
+            double longitude = (double)params[1];
+            long unixTime = (long)params[2];
 
-        String strJson = getTimeZoneJson(latitude, longitude, unixTime);
-        String timezone = getTimeZone(strJson);
-        return timezone;
+            String strJson = null;//getTimeZoneJson(latitude, longitude, unixTime);
+            if (strJson == null) {
+                Cursor cursor = mContext.getContentResolver().query(
+                        WeatherContract.LocationEntry.CONTENT_URI,
+                        null,
+                        WeatherContract.LocationEntry.COLUMN_COORD_LAT + " = '" + latitude + "' AND " +
+                                WeatherContract.LocationEntry.COLUMN_COORD_LONG + " = '" + longitude + "'",
+                        null,
+                        WeatherContract.LocationEntry.COLUMN_COUNTRY_CODE + " ASC LIMIT 1"
+                );
+
+                cursor.moveToFirst();
+                int cnt = cursor.getCount();
+
+                if (cnt == 1) {
+                    String timezone;
+                    timezone = cursor.getString(6);
+                    return timezone;
+                } else {
+                    String timezone = "UTC";
+                    return timezone;
+                }
+            } else {
+                String timezone = getTimeZone(strJson);
+                return timezone;
+            }
+        } catch (Exception e) {
+            String timezone = "UTC";
+            return timezone;
+        }
+
+
     }
 
     @Override

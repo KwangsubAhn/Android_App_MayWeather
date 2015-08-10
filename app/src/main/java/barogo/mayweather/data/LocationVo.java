@@ -15,4 +15,5 @@ public class LocationVo {
     public double coord_lat;
     public double coord_long;
     public String country_code;
+    public String time_zone;
 }

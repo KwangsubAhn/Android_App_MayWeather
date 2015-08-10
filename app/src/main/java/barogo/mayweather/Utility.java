@@ -38,7 +38,7 @@ public class Utility {
 //    public static final int HOURLY_WEATHER = 1;
 //    public static final int DAILY_WEATHER = 2;
 
-    public static int findWeatherConditionImg(String condition, double rain) {
+    public static int findWeatherConditionImg(String condition, double rain, boolean bIgnoreLittleRain) {
 
         switch (condition) {
             case "01d": return R.drawable.art_clear;        case "01n": return R.drawable.art_clear_night;
@@ -46,13 +46,16 @@ public class Utility {
             case "03d": return R.drawable.art_clouds;       case "03n": return R.drawable.art_clouds;
             case "04d": return R.drawable.art_clouds;       case "04n": return R.drawable.art_clouds;
             case "09d":
-            case "09n": if (rain < 3.0d) {return R.drawable.art_light_rain3;}
+            case "09n": if (rain < 1.0d && bIgnoreLittleRain) {return R.drawable.art_clouds;}
+                        else if (rain < 3.0d) {return R.drawable.art_light_rain3;}
                         else if (rain < 10.0d) {return R.drawable.art_light_rain2;}
                         else {return R.drawable.art_light_rain;}
-            case "10d": if (rain < 3.0d) {return R.drawable.art_shower_rain3;}
+            case "10d": if (rain < 1.0d && bIgnoreLittleRain) {return R.drawable.art_light_clouds;}
+                        else if (rain < 3.0d) {return R.drawable.art_shower_rain3;}
                         else if (rain < 10.0d) {return R.drawable.art_shower_rain2;}
                         else {return R.drawable.art_shower_rain;}
-            case "10n": if (rain < 3.0d) {return R.drawable.art_shower_rain_night3;}
+            case "10n": if (rain < 1.0d && bIgnoreLittleRain) {return R.drawable.art_light_clouds_night;}
+                        else if (rain < 3.0d) {return R.drawable.art_shower_rain_night3;}
                         else if (rain < 10.0d) {return R.drawable.art_shower_rain_night2;}
                         else {return R.drawable.art_shower_rain_night;}
 //            case "09d": return R.drawable.art_rain;         case "09n": return R.drawable.art_rain;

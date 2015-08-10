@@ -55,85 +55,104 @@ public class AdapterDaily extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        try {
+            ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        viewHolder.iconView.setImageResource(Utility.findWeatherConditionImg(
-                cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_ICON)),
-                Double.parseDouble(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN)))));
+            viewHolder.iconView.setImageResource(Utility.findWeatherConditionImg(
+                    cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_ICON)),
+                    Double.parseDouble(cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN))), true));
 
-        String simpleDate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
+            String simpleDate = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DATE));
 
-        String date = simpleDate.split(" ")[0];
-        String dayOfMonth = date.split("-")[2];
+            String date = simpleDate.split(" ")[0];
+            String dayOfMonth = date.split("-")[2];
 
-        String dayOfWeek = Utility.getDayOfWeek(simpleDate);
+            String dayOfWeek = Utility.getDayOfWeek(simpleDate);
 
-        viewHolder.date.setText(Utility.getReadableDateString(simpleDate)[0]);
+            viewHolder.date.setText(Utility.getReadableDateString(simpleDate)[0]);
 
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final TextView todayView = (TextView)((Activity)context).getWindow().getDecorView().findViewById(R.id.weather_today_date);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final TextView todayView = (TextView)((Activity)context).getWindow().getDecorView().findViewById(R.id.weather_today_date);
 
-        SpannableString spanDayOfWeek = new SpannableString(dayOfWeek);
+            SpannableString spanDayOfWeek = new SpannableString(dayOfWeek);
 
-        Date dtToday = Utility.getDate(("" + todayView.getText()).split(", ")[1]);
+            Date dtToday = Utility.getDate(("" + todayView.getText()).split(", ")[1]);
 
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        String timezone = settings.getString("TIME_ZONE", "UTC");
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+            String timezone = settings.getString("TIME_ZONE", "UTC");
 //        Calendar c = Calendar.getInstance();
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
-        c.setTime(dtToday);
+            Calendar c = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+            c.setTime(dtToday);
 
-        Date dtCurTime = c.getTime();
+            Date dtCurTime = c.getTime();
 
-        c.add(Calendar.DATE, 1);
+            c.add(Calendar.DATE, 1);
 
-        Date dtAddOneDay = c.getTime();
+            Date dtAddOneDay = c.getTime();
 
-        Date dtDateFromList = Utility.getDate(viewHolder.date.getText().toString());
+            Date dtDateFromList = Utility.getDate(viewHolder.date.getText().toString());
 
-        if (dtAddOneDay.compareTo(dtDateFromList) == 0) {   //if true, it's tomorrow
-            spanDayOfWeek = new SpannableString("Tomorrow");
-        }
+            if (dtAddOneDay.compareTo(dtDateFromList) == 0) {   //if true, it's tomorrow
+                spanDayOfWeek = new SpannableString("Tomorrow");
+            }
 
-        if(dayOfWeek.toUpperCase().equals("SUNDAY")) {
-            StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
-            spanDayOfWeek.setSpan(boldSpan, 0, spanDayOfWeek.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spanDayOfWeek.setSpan(new ForegroundColorSpan(Color.BLACK), 0, spanDayOfWeek.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
+            if(dayOfWeek.toUpperCase().equals("SUNDAY")) {
+                StyleSpan boldSpan = new StyleSpan(Typeface.BOLD);
+                spanDayOfWeek.setSpan(boldSpan, 0, spanDayOfWeek.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spanDayOfWeek.setSpan(new ForegroundColorSpan(Color.BLACK), 0, spanDayOfWeek.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
 
-        viewHolder.day.setText(spanDayOfWeek);
+            viewHolder.day.setText(spanDayOfWeek);
 
-        viewHolder.tempMin.setText("" + (int) Math.floor(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MIN))) + (char) 0x00B0);
+            viewHolder.tempMin.setText("" + (int) Math.floor(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MIN))) + (char) 0x00B0);
 
-        viewHolder.tempMax.setText("" + (int) Math.ceil(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MAX))) + (char) 0x00B0);
+            viewHolder.tempMax.setText("" + (int) Math.ceil(cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_TEMP_MAX))) + (char) 0x00B0);
 
-        double rain = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN));
-        double snow = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_SNOW));
-        String desc = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESC));
+            double rain = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_RAIN));
+            double snow = cursor.getDouble(cursor.getColumnIndex(WeatherEntry.COLUMN_SNOW));
+            String desc = cursor.getString(cursor.getColumnIndex(WeatherEntry.COLUMN_DESC));
 
-        if (rain >= 0.05d && desc.contains("rain")) {
-            rain = Math.round(rain*10);
-            rain = rain / 10.0d;
-            viewHolder.rainfall.setText(""+rain+"mm");
-        } else if (rain > 0d && rain < 0.05d && desc.contains("rain")) {
-            viewHolder.rainfall.setText("<0.1" + "mm");
-        } else {
-            viewHolder.rainfall.setText("");
-            if (desc.contains("rain")) {viewHolder.rainfall.setText("<0.1" + "mm");}
-        }
+            if (rain > 1.0d && desc.contains("rain")) {
+                rain = Math.round(rain*10);
+                rain = rain / 10.0d;
+                viewHolder.rainfall.setText(""+rain+"mm");
+            } else {
+                viewHolder.rainfall.setText("");
+            }
 
-        if (snow >= 0d && snow > rain && desc.contains("snow")) {
-            if (snow >= 0.05d) {
+            if (snow > 1.0d && desc.contains("snow")) {
                 snow = Math.round(snow*10);
                 snow = snow / 10.0d;
                 viewHolder.rainfall.setText(""+snow+"mm");
-            } else if (snow > 0d && snow < 0.05d) {
-                viewHolder.rainfall.setText("<0.1" + "mm");
-            } else {
-                viewHolder.rainfall.setText("");
-                if (desc.contains("snow")) {viewHolder.rainfall.setText("<0.1" + "mm");}
             }
+
+//            if (rain >= 0.05d && desc.contains("rain")) {
+//                rain = Math.round(rain*10);
+//                rain = rain / 10.0d;
+//                viewHolder.rainfall.setText(""+rain+"mm");
+//            } else if (rain > 0d && rain < 0.05d && desc.contains("rain")) {
+//                viewHolder.rainfall.setText("<0.1" + "mm");
+//            } else {
+//                viewHolder.rainfall.setText("");
+//                if (desc.contains("rain")) {viewHolder.rainfall.setText("<0.1" + "mm");}
+//            }
+
+//            if (snow >= 0d && snow > rain && desc.contains("snow")) {
+//                if (snow >= 0.05d) {
+//                    snow = Math.round(snow*10);
+//                    snow = snow / 10.0d;
+//                    viewHolder.rainfall.setText(""+snow+"mm");
+//                } else if (snow > 0d && snow < 0.05d) {
+//                    viewHolder.rainfall.setText("<0.1" + "mm");
+//                } else {
+//                    viewHolder.rainfall.setText("");
+//                    if (desc.contains("snow")) {viewHolder.rainfall.setText("<0.1" + "mm");}
+//                }
+//            }
+        } catch (Exception e) {
+
         }
+
 
     }
 

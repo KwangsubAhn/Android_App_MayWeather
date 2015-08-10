@@ -134,6 +134,7 @@ public class CityDialogRadio extends DialogFragment {
                     vo.coord_lat = cursor.getDouble(3);
                     vo.coord_long = cursor.getDouble(4);
                     vo.country_code = cursor.getString(5);
+                    vo.time_zone = cursor.getString(6);
                 }
 
                 cities.add(vo);

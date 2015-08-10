@@ -33,7 +33,7 @@ public class TestUtilities extends AndroidTestCase {
         testValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, 47.56);
         testValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, -52.71);
         testValues.put(WeatherContract.LocationEntry.COLUMN_COUNTRY_CODE, "CA");
-
+        testValues.put(WeatherContract.LocationEntry.COLUMN_TIME_ZONE, "");
         return testValues;
 
     }

@@ -29,7 +29,8 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                         LocationEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
                         LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
                         LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL, " +
-                        LocationEntry.COLUMN_COUNTRY_CODE + " TEXT NOT NULL);";
+                        LocationEntry.COLUMN_COUNTRY_CODE + " TEXT NOT NULL, " +
+                        LocationEntry.COLUMN_TIME_ZONE + " TEXT NOT NULL);";
 
         final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +
                 // Why AutoIncrement here, and not above?

@@ -56,10 +56,13 @@ public class FragmentTodayForecast extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        try {
+            super.onCreate(savedInstanceState);
 
-        setHasOptionsMenu(true);
-        updateWeather();
+            setHasOptionsMenu(true);
+            updateWeather();
+        } catch (Exception e){}
+
     }
 
     @Override
@@ -71,66 +74,71 @@ public class FragmentTodayForecast extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_today_item, container, false);
 
-        CurrentWeatherVo cur = Utility.getCurWeatherFromDB(getActivity());
-        ArrayList<CurrentWeatherVo> hourly = Utility.getHourlyWeatherFromDB(getActivity());
+        try {
+            // Inflate the layout for this fragment
 
-        if (cur != null) {updateCurView(rootView, cur);}
 
-        if (hourly != null) {updateHourlyView(rootView, hourly);}
+            CurrentWeatherVo cur = Utility.getCurWeatherFromDB(getActivity());
+            ArrayList<CurrentWeatherVo> hourly = Utility.getHourlyWeatherFromDB(getActivity());
 
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
+            if (cur != null) {updateCurView(rootView, cur);}
 
-                if (intent.getAction() == "TODAY") {
-                    CurrentWeatherVo weatherVo = intent.getParcelableExtra("CURRENT");
-                    updateCurView(rootView, weatherVo);
-                    //End Current
+            if (hourly != null) {updateHourlyView(rootView, hourly);}
 
-                } else if (intent.getAction() == "HOURLY") {
-                    //Set Today's Max/Min temp
-                    double dMax = Utility.getTemp(getActivity(), intent.getDoubleExtra("MAX", 0d));
-                    double dMin = Utility.getTemp(getActivity(), intent.getDoubleExtra("MIN", 0d));
+            receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
 
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                    settings.edit().putString("MAX", "" + intent.getDoubleExtra("MAX", 0d)).commit();
-                    settings.edit().putString("MIN", "" + intent.getDoubleExtra("MIN", 0d)).commit();
+                    if (intent.getAction() == "TODAY") {
+                        CurrentWeatherVo weatherVo = intent.getParcelableExtra("CURRENT");
+                        updateCurView(rootView, weatherVo);
+                        //End Current
 
-                    TextView weather_today_temp_bounds = (TextView) rootView.findViewById(R.id.weather_today_temp_bounds);
-                    weather_today_temp_bounds.setText("" + (int) Math.floor(dMin) + (char) 0x00B0 + " - "
-                            + (int) Math.ceil(dMax) + (char) 0x00B0);
-                    //
+                    } else if (intent.getAction() == "HOURLY") {
+                        //Set Today's Max/Min temp
+                        double dMax = Utility.getTemp(getActivity(), intent.getDoubleExtra("MAX", 0d));
+                        double dMin = Utility.getTemp(getActivity(), intent.getDoubleExtra("MIN", 0d));
 
-                    //Set Hourly Forecast
-                    CurrentWeatherVo weatherVo0 = intent.getParcelableExtra("HOURLY0");
-                    CurrentWeatherVo weatherVo1 = intent.getParcelableExtra("HOURLY1");
-                    CurrentWeatherVo weatherVo2 = intent.getParcelableExtra("HOURLY2");
-                    CurrentWeatherVo weatherVo3 = intent.getParcelableExtra("HOURLY3");
+                        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        settings.edit().putString("MAX", "" + intent.getDoubleExtra("MAX", 0d)).commit();
+                        settings.edit().putString("MIN", "" + intent.getDoubleExtra("MIN", 0d)).commit();
 
-                    ArrayList<CurrentWeatherVo> listWeatherVo = new ArrayList<CurrentWeatherVo>();
-                    listWeatherVo.add(weatherVo0);
-                    listWeatherVo.add(weatherVo1);
-                    listWeatherVo.add(weatherVo2);
-                    listWeatherVo.add(weatherVo3);
+                        TextView weather_today_temp_bounds = (TextView) rootView.findViewById(R.id.weather_today_temp_bounds);
+                        weather_today_temp_bounds.setText("" + (int) Math.floor(dMin) + (char) 0x00B0 + " - "
+                                + (int) Math.ceil(dMax) + (char) 0x00B0);
+                        //
 
-                    updateHourlyView(rootView, listWeatherVo);
+                        //Set Hourly Forecast
+                        CurrentWeatherVo weatherVo0 = intent.getParcelableExtra("HOURLY0");
+                        CurrentWeatherVo weatherVo1 = intent.getParcelableExtra("HOURLY1");
+                        CurrentWeatherVo weatherVo2 = intent.getParcelableExtra("HOURLY2");
+                        CurrentWeatherVo weatherVo3 = intent.getParcelableExtra("HOURLY3");
 
-                } else if (intent.getAction() == "DAILY") {
-                    System.out.print("");
-                    System.out.print("");
-                    System.out.print("");
-                } else {}
+                        ArrayList<CurrentWeatherVo> listWeatherVo = new ArrayList<CurrentWeatherVo>();
+                        listWeatherVo.add(weatherVo0);
+                        listWeatherVo.add(weatherVo1);
+                        listWeatherVo.add(weatherVo2);
+                        listWeatherVo.add(weatherVo3);
 
-                //Hourly
+                        updateHourlyView(rootView, listWeatherVo);
 
-                //End Hourly
-            }
-        };
+                    } else if (intent.getAction() == "DAILY") {
+                        System.out.print("");
+                        System.out.print("");
+                        System.out.print("");
+                    } else {}
 
-        return rootView;
+                    //Hourly
+
+                    //End Hourly
+                }
+            };
+
+            return rootView;
+        } catch (Exception e) {return rootView;}
+
     }
 
     private void updateCurView(View rootView, CurrentWeatherVo weatherVo){
@@ -162,7 +170,7 @@ public class FragmentTodayForecast extends Fragment {
         //
 
         ImageView img_today = (ImageView) rootView.findViewById(R.id.img_today);
-        img_today.setImageResource(Utility.findWeatherConditionImg(weatherVo.icon, weatherVo.rain));
+        img_today.setImageResource(Utility.findWeatherConditionImg(weatherVo.icon, weatherVo.rain, false));
 
         TextView weather_today_desc = (TextView) rootView.findViewById(R.id.weather_today_desc);
         weather_today_desc.setText(weatherVo.desc.toUpperCase());
@@ -208,6 +216,7 @@ public class FragmentTodayForecast extends Fragment {
         last_update.setText("last update:" + curTime);
         //End Current
     }
+
     private void updateHourlyView(View rootView, ArrayList<CurrentWeatherVo> hourly){
         CurrentWeatherVo weatherVo0 = hourly.get(0);
         CurrentWeatherVo weatherVo1 = hourly.get(1);
@@ -222,7 +231,7 @@ public class FragmentTodayForecast extends Fragment {
         weather_hourly_temp_1.setText("" + Math.round(tempHourly1) + (char) 0x00B0);
 
         ImageView img_hourly_1 = (ImageView) rootView.findViewById(R.id.img_hourly_1);
-        img_hourly_1.setImageResource(Utility.findWeatherConditionImg(weatherVo0.icon, weatherVo0.rain));
+        img_hourly_1.setImageResource(Utility.findWeatherConditionImg(weatherVo0.icon, weatherVo0.rain, false));
 
         if (weatherVo0.rain >= 0d && weatherVo0.desc.contains("rain")) {
 //            ImageView img_hourly_rainfall_1 = (ImageView) rootView.findViewById(R.id.img_hourly_rainfall_1);
@@ -253,7 +262,7 @@ public class FragmentTodayForecast extends Fragment {
         weather_hourly_temp_2.setText("" + Math.round(tempHourly2) + (char) 0x00B0);
 
         ImageView img_hourly_2 = (ImageView) rootView.findViewById(R.id.img_hourly_2);
-        img_hourly_2.setImageResource(Utility.findWeatherConditionImg(weatherVo1.icon, weatherVo1.rain));
+        img_hourly_2.setImageResource(Utility.findWeatherConditionImg(weatherVo1.icon, weatherVo1.rain, false));
 
         if (weatherVo1.rain >= 0d && weatherVo1.desc.contains("rain")) {
 //            ImageView img_hourly_rainfall_2 = (ImageView) rootView.findViewById(R.id.img_hourly_rainfall_2);
@@ -285,7 +294,7 @@ public class FragmentTodayForecast extends Fragment {
         weather_hourly_temp_3.setText("" + Math.round(tempHourly3) + (char) 0x00B0);
 
         ImageView img_hourly_3 = (ImageView) rootView.findViewById(R.id.img_hourly_3);
-        img_hourly_3.setImageResource(Utility.findWeatherConditionImg(weatherVo2.icon, weatherVo2.rain));
+        img_hourly_3.setImageResource(Utility.findWeatherConditionImg(weatherVo2.icon, weatherVo2.rain, false));
 
         if (weatherVo2.rain >= 0d && weatherVo2.desc.contains("rain")) {
 //            ImageView img_hourly_rainfall_3 = (ImageView) rootView.findViewById(R.id.img_hourly_rainfall_3);
@@ -317,7 +326,7 @@ public class FragmentTodayForecast extends Fragment {
         weather_hourly_temp_4.setText("" + Math.round(tempHourly4) + (char) 0x00B0);
 
         ImageView img_hourly_4 = (ImageView) rootView.findViewById(R.id.img_hourly_4);
-        img_hourly_4.setImageResource(Utility.findWeatherConditionImg(weatherVo3.icon, weatherVo3.rain));
+        img_hourly_4.setImageResource(Utility.findWeatherConditionImg(weatherVo3.icon, weatherVo3.rain, false));
 
         if (weatherVo3.rain > 0d && weatherVo3.desc.contains("rain")) {
 //            ImageView img_hourly_rainfall_4 = (ImageView) rootView.findViewById(R.id.img_hourly_rainfall_4);
