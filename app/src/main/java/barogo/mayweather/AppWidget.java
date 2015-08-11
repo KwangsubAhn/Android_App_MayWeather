@@ -83,6 +83,7 @@ public class AppWidget extends AppWidgetProvider {
             views.setTextViewText(R.id.text_widget, "" + Math.round(tempCur) + (char) 0x00B0);
 
             Intent openApp = new Intent(context, MainActivity.class);
+            openApp.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Adds the FLAG_ACTIVITY_NO_HISTORY flag
             PendingIntent pIntent = PendingIntent.getActivity(context, 0, openApp, 0);
 
             views.setOnClickPendingIntent(R.id.layout_widget, pIntent);
