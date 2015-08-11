@@ -2,6 +2,7 @@ package barogo.mayweather.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.appwidget.AppWidgetManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
@@ -46,12 +47,10 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
 
     public final String LOG_TAG = SyncAdapterCurrent.class.getSimpleName();
 
-    public static final int SYNC_INTERVAL = 60*40;
+    public static final int SYNC_INTERVAL = 30;//;60*40;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
-
-
-//
+    public static CurrentWeatherVo weatherVoCurrent = null;
 
     public SyncAdapterCurrent(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -94,10 +93,14 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
                         data, WeatherContract.WEATHER_TYPE_CURRENT);
 
             //sent Current WeatherInfo to UI
-            CurrentWeatherVo weatherVoCurrent = Utility.getCurWeatherFromDB(getContext());
+            weatherVoCurrent = Utility.getCurWeatherFromDB(getContext());
             Intent intentCurrent = new Intent("TODAY");
             intentCurrent.putExtra("CURRENT", weatherVoCurrent);
             LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentCurrent);
+
+            Intent intentWidget = new Intent("WIDGET");
+            intentWidget.putExtra("CURRENT", weatherVoCurrent);
+            LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentWidget);
             //
 
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
