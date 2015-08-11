@@ -40,6 +40,10 @@ public class Utility {
 
     public static int findWeatherConditionImg(String condition, double rain, boolean bIgnoreLittleRain) {
 
+        if (condition.length() == 4) {
+            condition = condition.substring(0,3);
+        }
+
         switch (condition) {
             case "01d": return R.drawable.art_clear;        case "01n": return R.drawable.art_clear_night;
             case "02d": return R.drawable.art_light_clouds; case "02n": return R.drawable.art_light_clouds_night;
