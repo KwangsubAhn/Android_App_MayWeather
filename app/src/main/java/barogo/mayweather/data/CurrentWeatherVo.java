@@ -5,9 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import barogo.mayweather.data.WeatherContract.WeatherEntry;
-/**
- * Created by user on 2015-07-17.
- */
+
 public class CurrentWeatherVo implements Parcelable {
     public int location_id;
     public int weather_type;

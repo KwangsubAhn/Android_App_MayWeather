@@ -7,7 +7,6 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
@@ -15,8 +14,6 @@ import android.content.SyncResult;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -34,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import barogo.mayweather.AsyncGetTimeZone;
 import barogo.mayweather.R;
 import barogo.mayweather.Utility;
 import barogo.mayweather.data.CurrentWeatherVo;
@@ -47,7 +43,7 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
 
     public final String LOG_TAG = SyncAdapterCurrent.class.getSimpleName();
 
-    public static final int SYNC_INTERVAL = 30;//;60*40;
+    public static final int SYNC_INTERVAL = 60*30;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
     public static CurrentWeatherVo weatherVoCurrent = null;
@@ -98,9 +94,14 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
             intentCurrent.putExtra("CURRENT", weatherVoCurrent);
             LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentCurrent);
 
+            ///
+            ///
             Intent intentWidget = new Intent("WIDGET");
-            intentWidget.putExtra("CURRENT", weatherVoCurrent);
-            LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentWidget);
+            intentWidget.putExtra("ICON", weatherVoCurrent.icon);
+            intentWidget.putExtra("TEMP", weatherVoCurrent.temp);
+            intentWidget.putExtra("RAIN", weatherVoCurrent.rain);
+                    getContext().sendBroadcast(intentWidget);
+//            LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentWidget);
             //
 
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
@@ -111,37 +112,35 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
 
             //get Hourly WeatherInfo from cloud (every 80min)
 //            if (!flagHourly.equals(Integer.toString(hour))) {
-                settings.getString("Flag_Hourly", Integer.toString(hour));
+            settings.getString("Flag_Hourly", Integer.toString(hour));
 
-                builtUri = Uri.parse(FORECAST_HOURLY_URL).buildUpon()
-                        .appendQueryParameter(LOCATION_PARAM, location)
-                        .appendQueryParameter(UNITS_PARAM, unit)
-                        .appendQueryParameter(DAYS_PARAM, "8")
-                        .build();
+            builtUri = Uri.parse(FORECAST_HOURLY_URL).buildUpon()
+                    .appendQueryParameter(LOCATION_PARAM, location)
+                    .appendQueryParameter(UNITS_PARAM, unit)
+                    .appendQueryParameter(DAYS_PARAM, "8")
+                    .build();
 
-                String strUrlHourly = builtUri.toString();
-                data = getWeatherInfo(strUrlHourly, WeatherContract.WEATHER_TYPE_HOURLY);
+            String strUrlHourly = builtUri.toString();
+            data = getWeatherInfo(strUrlHourly, WeatherContract.WEATHER_TYPE_HOURLY);
 
-                result = Utility.getWeatherDataFromJsonSaveDB(getContext(),
-                        data, WeatherContract.WEATHER_TYPE_HOURLY);
+            result = Utility.getWeatherDataFromJsonSaveDB(getContext(),
+                    data, WeatherContract.WEATHER_TYPE_HOURLY);
 
-                List<CurrentWeatherVo> weatherVoHourly = Utility.getHourlyWeatherFromDB(getContext());
-                Intent intentHourly = new Intent("HOURLY");
-                intentHourly.putExtra("HOURLY0", weatherVoHourly.get(0));
-                intentHourly.putExtra("HOURLY1", weatherVoHourly.get(1));
-                intentHourly.putExtra("HOURLY2", weatherVoHourly.get(2));
-                intentHourly.putExtra("HOURLY3", weatherVoHourly.get(3));
+            List<CurrentWeatherVo> weatherVoHourly = Utility.getHourlyWeatherFromDB(getContext());
+            Intent intentHourly = new Intent("HOURLY");
+            intentHourly.putExtra("HOURLY0", weatherVoHourly.get(0));
+            intentHourly.putExtra("HOURLY1", weatherVoHourly.get(1));
+            intentHourly.putExtra("HOURLY2", weatherVoHourly.get(2));
+            intentHourly.putExtra("HOURLY3", weatherVoHourly.get(3));
 
+            //Get today's max/min temp
+            double[] dMaxMin = Utility.getMaxMin(weatherVoHourly);
 
+            intentHourly.putExtra("MAX", dMaxMin[0]);
+            intentHourly.putExtra("MIN", dMaxMin[1]);
 
-                //Get today's max/min temp
-                double[] dMaxMin = Utility.getMaxMin(weatherVoHourly);
-
-                intentHourly.putExtra("MAX", dMaxMin[0]);
-                intentHourly.putExtra("MIN", dMaxMin[1]);
-
-                LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentHourly);
-//            }
+            LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intentHourly);
+//          }
 
             //get Daily WeatherInfo from cloud (once a day)
             if (!flagDaily.equals(Integer.toString(day))){
@@ -161,10 +160,11 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
                         data, WeatherContract.WEATHER_TYPE_DAILY);
 
             }
+
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (Exception e) {
-            Log.e(LOG_TAG, e.getMessage());
+//            Log.e(LOG_TAG, e.getMessage());
         }
 
     }
@@ -188,10 +188,6 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
         }
     }
 
-    /**
-     * Helper method to have the sync adapter sync immediately
-     * @param context The context used to access the account service
-     */
     public static void syncImmediately(Context context) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -295,7 +291,7 @@ public class SyncAdapterCurrent extends AbstractThreadedSyncAdapter {
             forecastJsonStr = buffer.toString();
 
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Error ", e);
             forecastJsonStr = null;
 

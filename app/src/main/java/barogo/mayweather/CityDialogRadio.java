@@ -6,37 +6,24 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import barogo.mayweather.data.CurrentWeatherVo;
 import barogo.mayweather.data.LocationVo;
 import barogo.mayweather.data.WeatherContract;
-import barogo.mayweather.data.WeatherDbHelper;
 
-/**
- * Created by user on 2015-07-26.
- */
 public class CityDialogRadio extends DialogFragment {
 
     ArrayList<LocationVo> listCities;
 
-    /** Declaring the interface, to invoke a callback function in the implementing activity class */
     AlertPositiveListener alertPositiveListener;
 
-    /** An interface to be implemented in the hosting activity for "OK" button click listener */
     interface AlertPositiveListener {
         public void onPositiveClick(LocationVo item);
     }
 
-    /** This is a callback method executed when this fragment is attached to an activity.
-     *  This function ensures that, the hosting activity implements the interface AlertPositiveListener
-     * */
     public void onAttach(android.app.Activity activity) {
         super.onAttach(activity);
         try{
@@ -47,10 +34,6 @@ public class CityDialogRadio extends DialogFragment {
         }
     }
 
-    /** This is the OK button listener for the alert dialog,
-     *  which in turn invokes the method onPositiveClick(position)
-     *  of the hosting activity which is supposed to implement it
-     */
     OnClickListener positiveListener = new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -61,9 +44,6 @@ public class CityDialogRadio extends DialogFragment {
         }
     };
 
-    /** This is a callback method which will be executed
-     *  on creating this fragment
-     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         this.setCancelable(false);

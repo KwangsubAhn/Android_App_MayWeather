@@ -28,8 +28,7 @@
                 <TextView android:id="@+id/weather_today_date"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="Thursday, July 19"
-                    android:textSize="28sp"
+                    android:textSize="24sp"
                     android:fontFamily="sans-serif-condensed"
                     android:gravity="center_vertical"
                     android:layout_marginTop="12sp" />
@@ -48,23 +47,27 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="8">
+                android:layout_weight="8"
+                android:weightSum="2">
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0sp"
                     android:layout_height="wrap_content"
-                    android:text="23&#xb0;"
-                    android:textSize="100sp"
+                    android:textSize="90sp"
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:textAppearance="?android:textAppearanceLarge"
-                    android:id="@+id/weather_today_temp" />
+                    android:fontFamily="sans-serif-condensed"
+                    android:id="@+id/weather_today_temp"
+                    android:layout_weight="1"/>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0sp"
                     android:layout_height="wrap_content"
                     android:textSize="34sp"
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="6sp"
-                    android:id="@+id/weather_today_temp_bounds" />
+                    android:fontFamily="sans-serif-condensed"
+                    android:id="@+id/weather_today_temp_bounds"
+                    android:layout_weight="1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -75,7 +78,7 @@
                 android:weightSum="2">
                 <ImageView
                     android:id="@+id/img_today"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0sp"
                     android:layout_height="wrap_content"
                     android:src="@drawable/art_clear"
                     android:adjustViewBounds="true"
@@ -83,7 +86,7 @@
                     android:layout_weight="1"/>
                 <LinearLayout
                     android:orientation="vertical"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0sp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_weight="1">
@@ -119,8 +122,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="80%"
                             android:textAppearance="?android:textAppearanceMedium"
+                            android:fontFamily="sans-serif-condensed"
                             android:layout_marginLeft="5sp"
                             android:id="@+id/weather_today_humidity" />
 
@@ -140,8 +143,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="5.1m/s"
                             android:textAppearance="?android:textAppearanceMedium"
+                            android:fontFamily="sans-serif-condensed"
                             android:layout_marginLeft="5sp" />
                     </LinearLayout>
 
@@ -167,7 +170,6 @@
                 <TextView android:id="@+id/weather_today_desc"
                     android:layout_width="0sp"
                     android:layout_height="match_parent"
-                    android:text="thunderstorm with heavy drizzle"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif-condensed"
                     android:layout_weight="1"
@@ -179,6 +181,7 @@
                     android:layout_width="0sp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:fontFamily="sans-serif-condensed"
                     android:paddingRight="24sp" />
             </LinearLayout>
 
@@ -207,20 +210,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="4"
-                android:weightSum="4"
                 android:paddingLeft="24sp">
 
                 <TextView android:id="@+id/weather_hourly_title"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:text="Forecast"
                     android:textAppearance="?android:textAppearanceLarge"
                     android:fontFamily="sans-serif-condensed"/>
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"/>
 
             </LinearLayout>
 
@@ -242,8 +239,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:text="03:00"
-                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textSize="17sp"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
                     <ImageView
@@ -251,13 +247,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_weight="8"
-                        android:src="@drawable/art_rain"/>
+                        android:layout_weight="8"/>
                     <TextView android:id="@+id/weather_hourly_temp_1"
                         android:layout_width="match_parent"
                         android:layout_height="0sp"
                         android:layout_weight="4"
-                        android:text="22&#xb0;"
                         android:textAppearance="?android:textAppearanceLarge"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
@@ -275,7 +269,8 @@
                             android:id="@+id/weather_hourly_rainfall_1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-condensed"/>
 
                     </LinearLayout>
                 </LinearLayout>
@@ -289,8 +284,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:text="03:00"
-                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textSize="17sp"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
                     <ImageView
@@ -298,13 +292,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_weight="8"
-                        android:src="@drawable/art_rain" />
+                        android:layout_weight="8"/>
                     <TextView android:id="@+id/weather_hourly_temp_2"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="4"
-                        android:text="22&#xb0;"
                         android:textAppearance="?android:textAppearanceLarge"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
@@ -322,7 +314,8 @@
                             android:id="@+id/weather_hourly_rainfall_2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-condensed"/>
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
@@ -335,8 +328,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:text="03:00"
-                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textSize="17sp"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
                     <ImageView
@@ -344,13 +336,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_weight="8"
-                        android:src="@drawable/art_rain" />
+                        android:layout_weight="8" />
                     <TextView android:id="@+id/weather_hourly_temp_3"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="4"
-                        android:text="22&#xb0;"
                         android:textAppearance="?android:textAppearanceLarge"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
@@ -368,7 +358,8 @@
                             android:id="@+id/weather_hourly_rainfall_3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-condensed"/>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -382,8 +373,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:text="03:00"
-                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textSize="17sp"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
                     <ImageView
@@ -391,13 +381,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_weight="8"
-                        android:src="@drawable/art_rain" />
+                        android:layout_weight="8"/>
                     <TextView android:id="@+id/weather_hourly_temp_4"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="4"
-                        android:text="22&#xb0;"
                         android:textAppearance="?android:textAppearanceLarge"
                         android:fontFamily="sans-serif-condensed"
                         android:gravity="center"/>
@@ -415,7 +403,8 @@
                             android:id="@+id/weather_hourly_rainfall_4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            android:fontFamily="sans-serif-condensed"/>
                     </LinearLayout>
 
                 </LinearLayout>

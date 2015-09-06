@@ -1,15 +1,11 @@
 package barogo.mayweather;
 
-import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,12 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import barogo.mayweather.data.WeatherContract;
-import barogo.mayweather.data.WeatherDbHelper;
-import barogo.mayweather.sync.SyncAdapterCurrent;
 
-/**
- * Created by user on 2015-07-27.
- */
 public class AsyncGetTimeZone extends AsyncTask<Object, Void, String> {
 
     private Context mContext;
@@ -47,8 +38,9 @@ public class AsyncGetTimeZone extends AsyncTask<Object, Void, String> {
                 Cursor cursor = mContext.getContentResolver().query(
                         WeatherContract.LocationEntry.CONTENT_URI,
                         null,
-                        WeatherContract.LocationEntry.COLUMN_COORD_LAT + " = '" + latitude + "' AND " +
-                                WeatherContract.LocationEntry.COLUMN_COORD_LONG + " = '" + longitude + "'",
+                        WeatherContract.LocationEntry.COLUMN_COORD_LAT + " = '" + latitude
+                                + "' AND " + WeatherContract.LocationEntry.COLUMN_COORD_LONG
+                                + " = '" + longitude + "'",
                         null,
                         WeatherContract.LocationEntry.COLUMN_COUNTRY_CODE + " ASC LIMIT 1"
                 );
@@ -103,7 +95,7 @@ public class AsyncGetTimeZone extends AsyncTask<Object, Void, String> {
         BufferedReader reader = null;
 
         String timezoneJsonStr = null;
-        http://api.geonames.org/timezoneJSON?formatted=true&lat=13.0&lng=121.0&username=demo&style=full
+//        http://api.geonames.org/timezoneJSON?formatted=true&lat=13.0&lng=121.0&username=demo&style=full
         try {
             final String BASE_URL = "http://api.geonames.org/timezoneJSON?";
 
@@ -120,18 +112,6 @@ public class AsyncGetTimeZone extends AsyncTask<Object, Void, String> {
                     .appendQueryParameter(PARAM4, "demo")
                     .appendQueryParameter(PARAM5, "full")
                     .build();
-
-            /*final String BASE_URL = "https://maps.googleapis.com/maps/api/timezone/json?";
-
-            final String LOCATION_PARAM = "location";
-            final String TIME_PARAM = "timestamp";
-            final String SENSOR_PARAM = "sensor";
-
-            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                    .appendQueryParameter(LOCATION_PARAM, "" + lat + "," + lon)
-                    .appendQueryParameter(TIME_PARAM, ""+unixTime)
-                    .appendQueryParameter(SENSOR_PARAM, "false")
-                    .build();*/
 
             URL url = new URL(builtUri.toString());
 

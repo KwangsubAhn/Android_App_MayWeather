@@ -8,9 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-/**
- * Created by user on 2015-07-17.
- */
 public class WeatherProvider extends ContentProvider {
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -26,8 +23,6 @@ public class WeatherProvider extends ContentProvider {
     static{
         sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
 
-        //This is an inner join which looks like
-        //weather INNER JOIN location ON weather.location_id = location._id
         sWeatherByLocationSettingQueryBuilder.setTables(
                 WeatherContract.WeatherEntry.TABLE_NAME + " INNER JOIN " +
                         WeatherContract.LocationEntry.TABLE_NAME +
@@ -65,7 +60,7 @@ public class WeatherProvider extends ContentProvider {
             selection = sLocationSettingSelection;
             selectionArgs = new String[]{locationSetting};
         } else {
-            selectionArgs = new String[]{locationSetting, startDate/*Long.toString(startDate)*/};
+            selectionArgs = new String[]{locationSetting, startDate};
             selection = sLocationSettingWithStartDateSelection;
         }
 
@@ -254,16 +249,9 @@ public class WeatherProvider extends ContentProvider {
     }
 
     static UriMatcher buildUriMatcher() {
-        // I know what you're thinking.  Why create a UriMatcher when you can use regular
-        // expressions instead?  Because you're not crazy, that's why.
-
-        // All paths added to the UriMatcher have a corresponding code to return when a match is
-        // found.  The code passed into the constructor represents the code to return for the root
-        // URI.  It's common to use NO_MATCH as the code for this case.
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = WeatherContract.CONTENT_AUTHORITY;
 
-        // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, WeatherContract.PATH_WEATHER, WEATHER);
         matcher.addURI(authority, WeatherContract.PATH_WEATHER + "/*", WEATHER_WITH_LOCATION);
         matcher.addURI(authority, WeatherContract.PATH_WEATHER + "/*/*", WEATHER_WITH_LOCATION_AND_DATE);

@@ -27,20 +27,13 @@ import barogo.mayweather.data.CurrentWeatherVo;
 import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherContract.WeatherEntry;
 
-/**
- * Created by user on 2015-07-17.
- */
 public class Utility {
 
     private static final String LOG_TAG = Utility.class.getSimpleName();
 
-//    public static final int CURRENT_WEATHER = 0;
-//    public static final int HOURLY_WEATHER = 1;
-//    public static final int DAILY_WEATHER = 2;
-
     public static int findWeatherConditionImg(String condition, double rain, boolean bIgnoreLittleRain) {
 
-        if (condition.length() == 4) {
+        if (condition.length() >= 4) {
             condition = condition.substring(0,3);
         }
 

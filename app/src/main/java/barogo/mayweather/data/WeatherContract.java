@@ -5,9 +5,6 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-/**
- * Created by user on 2015-07-17.
- */
 public class WeatherContract {
 
     public static final String CONTENT_AUTHORITY = "barogo.mayweather";
@@ -89,15 +86,12 @@ public class WeatherContract {
 
         public static Uri buildWeatherLocationWithStartDate(
                 String locationSetting, String startDate) {
-//            long normalizedDate = normalizeDate(startDate);
             return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendQueryParameter(COLUMN_DATE, startDate/*Long.toString(normalizedDate)*/)
-                    .build();
+                    .appendQueryParameter(COLUMN_DATE, startDate).build();
         }
 
         public static Uri buildWeatherLocationWithDate(String locationSetting, String date) {
-            return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendPath(date/*Long.toString(normalizeDate(date))*/).build();
+            return CONTENT_URI.buildUpon().appendPath(locationSetting).appendPath(date).build();
         }
 
         public static String getLocationSettingFromUri(Uri uri) {
@@ -105,15 +99,16 @@ public class WeatherContract {
         }
 
         public static String getDateFromUri(Uri uri) {
-            return uri.getPathSegments().get(2);//Long.parseLong(uri.getPathSegments().get(2));
+            return uri.getPathSegments().get(2);
         }
 
         public static String getStartDateFromUri(Uri uri) {
             String dateString = uri.getQueryParameter(COLUMN_DATE);
-            if (null != dateString && dateString.length() > 0)
-                return dateString;//Long.parseLong(dateString);
-            else
+            if (null != dateString && dateString.length() > 0){
+                return dateString;
+            } else {
                 return "";
+            }
         }
     }
 }

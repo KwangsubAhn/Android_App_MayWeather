@@ -1,15 +1,7 @@
 package barogo.mayweather;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -17,26 +9,13 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import barogo.mayweather.CityDialogRadio.AlertPositiveListener;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.Date;
-import java.util.List;
 
-import barogo.mayweather.data.CurrentWeatherVo;
 import barogo.mayweather.data.LocationVo;
-import barogo.mayweather.data.WeatherContract;
-import barogo.mayweather.data.WeatherDbHelper;
-import barogo.mayweather.sync.SyncAdapterCurrent;
 
-/**
- * Created by user on 2015-07-20.
- */
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener, AlertPositiveListener{
 
@@ -147,7 +126,7 @@ public class SettingsActivity extends PreferenceActivity
             pref.setSummary(selected.city_name);
             pref.setText(selected.city_name);
 
-            ///
+            //
             double lat = selected.coord_lat;
             double log = selected.coord_long;
             Date now = new Date();
@@ -157,7 +136,7 @@ public class SettingsActivity extends PreferenceActivity
             AsyncGetTimeZone task = new AsyncGetTimeZone(this);
 
             task.execute(new Object[]{lat, log, unixTime});
-            ///
+            //
 
             this.setResult(RESULT_OK, intent);
         } else {

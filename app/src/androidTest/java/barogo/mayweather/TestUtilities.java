@@ -23,7 +23,7 @@ public class TestUtilities extends AndroidTestCase {
 
     static final String TEST_LOCATION = "6324733";
     //    static final long TEST_DATE = 1419033600L;
-    static final String TEST_DATE = "2015-07-06 19:38:42";
+    static final String TEST_DATE = "1970-07-06 19:38:42";
 
     static ContentValues createLocationValues() {
         ContentValues testValues = new ContentValues();

@@ -1,13 +1,10 @@
 package barogo.mayweather;
 
-import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -15,26 +12,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
-import barogo.mayweather.data.CurrentWeatherVo;
 import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherDbHelper;
 
-/**
- * Created by user on 2015-07-19.
- */
+
 public class Test extends AndroidTestCase {
 
     public void testWriteCity() throws Throwable {

@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * Created by user on 2015-08-04.
- */
 public class TestCityFile extends AndroidTestCase {
 
     public void testReadCity() throws Throwable {

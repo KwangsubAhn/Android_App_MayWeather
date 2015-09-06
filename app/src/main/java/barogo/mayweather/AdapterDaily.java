@@ -2,39 +2,28 @@ package barogo.mayweather;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
-import barogo.mayweather.data.CurrentWeatherVo;
-import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherContract.WeatherEntry;
-/**
- * Created by user on 2015-07-17.
- */
+
 public class AdapterDaily extends CursorAdapter {
 
     public AdapterDaily(Context context, Cursor c, int flags) {
@@ -126,29 +115,6 @@ public class AdapterDaily extends CursorAdapter {
                 viewHolder.rainfall.setText(""+snow+"mm");
             }
 
-//            if (rain >= 0.05d && desc.contains("rain")) {
-//                rain = Math.round(rain*10);
-//                rain = rain / 10.0d;
-//                viewHolder.rainfall.setText(""+rain+"mm");
-//            } else if (rain > 0d && rain < 0.05d && desc.contains("rain")) {
-//                viewHolder.rainfall.setText("<0.1" + "mm");
-//            } else {
-//                viewHolder.rainfall.setText("");
-//                if (desc.contains("rain")) {viewHolder.rainfall.setText("<0.1" + "mm");}
-//            }
-
-//            if (snow >= 0d && snow > rain && desc.contains("snow")) {
-//                if (snow >= 0.05d) {
-//                    snow = Math.round(snow*10);
-//                    snow = snow / 10.0d;
-//                    viewHolder.rainfall.setText(""+snow+"mm");
-//                } else if (snow > 0d && snow < 0.05d) {
-//                    viewHolder.rainfall.setText("<0.1" + "mm");
-//                } else {
-//                    viewHolder.rainfall.setText("");
-//                    if (desc.contains("snow")) {viewHolder.rainfall.setText("<0.1" + "mm");}
-//                }
-//            }
         } catch (Exception e) {
 
         }

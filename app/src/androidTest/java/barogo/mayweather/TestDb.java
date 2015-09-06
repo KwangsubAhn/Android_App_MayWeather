@@ -9,9 +9,6 @@ import java.util.HashSet;
 import barogo.mayweather.data.WeatherContract;
 import barogo.mayweather.data.WeatherDbHelper;
 
-/**
- * Created by user on 2015-07-17.
- */
 public class TestDb extends AndroidTestCase {
 
     public static final String LOG_TAG = TestDb.class.getSimpleName();
@@ -21,9 +18,6 @@ public class TestDb extends AndroidTestCase {
     }
 
     public void testCreateDb() throws Throwable {
-        // build a HashSet of all of the table names we wish to look for
-        // Note that there will be another table in the DB that stores the
-        // Android metadata (db version information)
         final HashSet<String> tableNameHashSet = new HashSet<String>();
         tableNameHashSet.add(WeatherContract.LocationEntry.TABLE_NAME);
         tableNameHashSet.add(WeatherContract.WeatherEntry.TABLE_NAME);
@@ -34,8 +28,6 @@ public class TestDb extends AndroidTestCase {
 
         assertEquals(true, db.isOpen());
 
-        //get all created tables
-        // have we created the tables we want?
         Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
 
         assertTrue("Error: This means that the database has not been created correctly",

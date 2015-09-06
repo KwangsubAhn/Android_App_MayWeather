@@ -7,9 +7,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import barogo.mayweather.data.WeatherContract.LocationEntry;
 import barogo.mayweather.data.WeatherContract.WeatherEntry;
 
-/**
- * Created by user on 2015-07-17.
- */
 public class WeatherDbHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
@@ -33,11 +30,6 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                         LocationEntry.COLUMN_TIME_ZONE + " TEXT NOT NULL);";
 
         final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +
-                // Why AutoIncrement here, and not above?
-                // Unique keys will be auto-generated in either case.  But for weather
-                // forecasting, it's reasonable to assume the user will want information
-                // for a certain date and all dates *following*, so the forecast data
-                // should be sorted accordingly.
                 WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 WeatherEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " +
                 WeatherEntry.COLUMN_TYPE + " INTEGER NOT NULL, " +
@@ -58,13 +50,9 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 WeatherEntry.COLUMN_SUNRISE + " TEXT NOT NULL, " +
                 WeatherEntry.COLUMN_SUNSET + " TEXT NOT NULL, " +
 
-
-                // Set up the location column as a foreign key to location table.
                 " FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +
                 LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
 
-                // To assure the application have just one weather entry per day
-                // per location, it's created a UNIQUE constraint with REPLACE strategy
                 " UNIQUE (" + WeatherEntry.COLUMN_DATE + ", " +
                 WeatherEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
 

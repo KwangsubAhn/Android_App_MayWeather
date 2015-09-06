@@ -1,13 +1,10 @@
 package barogo.mayweather;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 import barogo.mayweather.sync.SyncAdapterCurrent;
 
@@ -61,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
             deleteExistDB();
             moveFile();
         }
-//        settings.edit().putString("SSSS", "SSSS");
-
 
         viewPager = (ViewPager)findViewById(R.id.pager);
         viewPager.setAdapter(new SwipeTabAdapter(getSupportFragmentManager()));
@@ -70,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                //Log.d(LOG_TAG, "onPageScrolled at " + " position " + position + " from " +
-                //              positionOffset + " with number of pixels= " + positionOffsetPixels);
+//                Log.d(LOG_TAG, "onPageScrolled at " + " position " + position + " from " +
+//                positionOffset + " with number of pixels= " + positionOffsetPixels);
             }
 
             @Override
             public void onPageSelected(int position) {
-                //Log.d(LOG_TAG, "onPageSelected at " + " position " + position);
+//                Log.d(LOG_TAG, "onPageSelected at " + " position " + position);
 //                actionBar.setSelectedNavigationItem(position);
             }
 
@@ -93,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
                 if (state == ViewPager.SCROLL_STATE_SETTLING) {
                     Log.d(LOG_TAG, "onPageScrollStateChanged Settling");
                 }
-    }
-});
+            }
+    });
 
         SyncAdapterCurrent.initializeSyncAdapter(this);
     }

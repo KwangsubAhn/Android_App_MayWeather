@@ -7,9 +7,6 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.os.Bundle;
 
-/**
- * Created by user on 2015-07-18.
- */
 public class WeatherAuthenticator extends AbstractAccountAuthenticator {
 
     public WeatherAuthenticator(Context context) {
